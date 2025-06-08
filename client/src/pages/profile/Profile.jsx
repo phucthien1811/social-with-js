@@ -73,18 +73,18 @@ const Profile = () => {
                 <a href="http://facebook.com">
                   <FacebookTwoToneIcon fontSize="large" />
                 </a>
-                <a href="http://facebook.com">
+                <a href="#">
                   <InstagramIcon fontSize="large" />
                 </a>
-                <a href="http://facebook.com">
+                {/* <a href="#">
                   <TwitterIcon fontSize="large" />
-                </a>
-                <a href="http://facebook.com">
+                </a> */}
+                <a href="#">
                   <LinkedInIcon fontSize="large" />
                 </a>
-                <a href="http://facebook.com">
+                {/* <a href="#">
                   <PinterestIcon fontSize="large" />
-                </a>
+                </a> */}
               </div>
               <div className="center">
                 <span>{data.name}</span>
