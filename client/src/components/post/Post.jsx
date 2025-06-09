@@ -6,27 +6,25 @@ import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import moment from "moment";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
-import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
   const { currentUser } = useContext(AuthContext);
 
+  // Lấy danh sách likes của bài viết
   const { isLoading, error, data } = useQuery(["likes", post.id], () =>
-    makeRequest.get("/likes?postId=" + post.id).then((res) => {
-      return res.data;
-    })
+    makeRequest.get("/likes?postId=" + post.id).then((res) => res.data)
   );
 
   const queryClient = useQueryClient();
 
+  // Mutation để xử lý like/unlike
   const mutation = useMutation(
     (liked) => {
       if (liked) return makeRequest.delete("/likes?postId=" + post.id);
@@ -34,25 +32,30 @@ const Post = ({ post }) => {
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["likes"]);
+        // Chỉ làm mới query 'likes' của đúng bài post này để tối ưu
+        queryClient.invalidateQueries(["likes", post.id]);
       },
     }
   );
+
+  // Mutation để xóa bài viết
   const deleteMutation = useMutation(
     (postId) => {
       return makeRequest.delete("/posts/" + postId);
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
+        // Làm mới tất cả các query 'posts'
         queryClient.invalidateQueries(["posts"]);
       },
     }
   );
 
   const handleLike = () => {
-    mutation.mutate(data.includes(currentUser.id));
+    // Thêm kiểm tra 'data' để tránh crash khi dữ liệu chưa tải xong
+    if (data) {
+      mutation.mutate(data.includes(currentUser.id));
+    }
   };
 
   const handleDelete = () => {
@@ -62,9 +65,10 @@ const Post = ({ post }) => {
   return (
     <div className="post">
       <div className="container">
+        {/* --- PHẦN GIAO DIỆN USER INFO (Đầy đủ) --- */}
         <div className="user">
           <div className="userInfo">
-            <img src={"/upload/"+post.profilePic} alt="" />
+            <img src={"/upload/" + post.profilePic} alt="" />
             <div className="details">
               <Link
                 to={`/profile/${post.userId}`}
@@ -80,15 +84,17 @@ const Post = ({ post }) => {
             <button onClick={handleDelete}>delete</button>
           )}
         </div>
+        {/* --- PHẦN NỘI DUNG BÀI VIẾT (Đầy đủ) --- */}
         <div className="content">
           <p>{post.desc}</p>
           <img src={"/upload/" + post.img} alt="" />
         </div>
+        {/* --- PHẦN TƯƠNG TÁC (Đầy đủ) --- */}
         <div className="info">
           <div className="item">
             {isLoading ? (
               "loading"
-            ) : data.includes(currentUser.id) ? (
+            ) : data && data.includes(currentUser.id) ? (
               <FavoriteOutlinedIcon
                 style={{ color: "red" }}
                 onClick={handleLike}

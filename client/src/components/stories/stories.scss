@@ -5,20 +5,25 @@
   gap: 10px;
   height: 250px;
   margin-bottom: 30px;
+  overflow-x: auto;
+  &::-webkit-scrollbar { display: none; }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 
   @include mobile {
     height: 50px;
     margin-bottom: 0;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
-  @include tablet{
+  @include tablet {
     height: 150px;
     gap: 20px;
   }
 
   .story {
-    flex: 1;
+    width: 140px;
+    flex-shrink: 0;
     border-radius: 10px;
     overflow: hidden;
     position: relative;
@@ -35,6 +40,7 @@
       height: 100%;
       object-fit: cover;
     }
+
     span {
       position: absolute;
       bottom: 10px;
@@ -46,7 +52,8 @@
       }
     }
 
-    button {
+    // THAY THẾ TOÀN BỘ SELECTOR `button` BẰNG `label`
+    label {
       position: absolute;
       bottom: 40px;
       left: 10px;
@@ -61,14 +68,50 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      line-height: 0;
 
       @include mobile {
-       left: 0;
-       right: 0;
-       top: 0;
-       bottom: 0;
-       margin: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
       }
+    }
+  }
+}
+// Dán toàn bộ đoạn code này vào cuối file stories.scss của bạn
+
+.story {
+  // ... các style cũ của bạn ở đây ...
+
+  // Style cho icon "3 chấm"
+  .more-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: white;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    padding: 2px;
+  }
+
+  // Style cho nút "Delete"
+  .delete-button {
+    position: absolute;
+    top: 40px; // Hiện ra ngay dưới nút 3 chấm
+    right: 10px;
+    border: none;
+    background-color: #f0544f; // Màu đỏ
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+
+    &:hover {
+      background-color: #d63d39;
     }
   }
 }

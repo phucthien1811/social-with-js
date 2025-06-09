@@ -11,7 +11,7 @@
     position: sticky;
     top: 0;
     background-color: themed("bg");
-    color:themed("textColor");
+    color: themed("textColor");
     z-index: 999;
 
     .left {
@@ -24,14 +24,30 @@
         font-size: 20px;
         color: themed("logo");
       }
+      
+      // --- STYLE CHO CÁC ICON CÓ THỂ BẤM VÀO ---
+      a {
+        display: flex; // Cần thiết để căn chỉnh icon
+        align-items: center;
+      }
 
+      .MuiSvgIcon-root {
+        cursor: pointer;
+        transition: color 0.3s ease;
+        &:hover {
+          color: themed("logo");
+        }
+      }
+
+      // --- THANH TÌM KIẾM ĐÃ ĐƯỢC THIẾT KẾ LẠI ---
       .search {
         display: flex;
         align-items: center;
         gap: 10px;
+        background-color: themed("bgSoft"); // Dùng màu nền mềm hơn
         border: 1px solid themed("border");
-        border-radius: 5px;
-        padding: 5px;
+        border-radius: 20px; // Bo tròn hơn
+        padding: 8px 12px;
 
         input {
           border: none;
@@ -39,11 +55,20 @@
           background-color: transparent;
           color: themed("textColor");
 
-          @include mobile{
+          // Làm cho placeholder đẹp hơn
+          &::placeholder {
+            color: themed("textColorSoft");
+          }
+          
+          &:focus {
+            outline: none; // Bỏ viền xanh khi focus
+          }
+
+          @include mobile {
             display: none;
           }
 
-          @include tablet{
+          @include tablet {
             width: 200px;
           }
         }
@@ -55,17 +80,37 @@
       align-items: center;
       gap: 20px;
 
-      @include mobile{
+      @include mobile {
         display: none;
       }
+      
+      // Style chung cho các icon bên phải
+      .MuiSvgIcon-root {
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
 
+      .logout-icon {
+        &:hover {
+          color: #f0544f;
+        }
+      }
+      
       .user {
         display: flex;
         align-items: center;
         gap: 10px;
         font-weight: 500;
+        
+        // Thêm hiệu ứng khi di chuột vào user
+        padding: 5px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        &:hover {
+          background-color: themed("bgSoft");
+        }
 
-        @include tablet{
+        @include tablet {
           display: none;
         }
 

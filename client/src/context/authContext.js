@@ -1,5 +1,5 @@
-import axios from "axios";
 import { createContext, useEffect, useState } from "react";
+import { makeRequest } from "../axios"; // Sử dụng makeRequest để đảm bảo cookie được gửi đi
 
 export const AuthContext = createContext();
 
@@ -9,30 +9,36 @@ export const AuthContextProvider = ({ children }) => {
   );
 
   const login = async (inputs) => {
-    const res = await axios.post("http://localhost:8800/api/auth/login", inputs);
+    // Sửa lại để dùng makeRequest
+    const res = await makeRequest.post("/auth/login", inputs);
     setCurrentUser(res.data);
   };
 
+  // Bỏ các dòng console.log không cần thiết
   const updateUser = (data) => {
-    console.log("--- [FRONTEND LOG 3] Hàm updateUser trong Context được gọi với data:", data);
-    console.log("--- [FRONTEND LOG 4] currentUser TRƯỚC KHI cập nhật:", currentUser);
-    
     const updatedUser = { ...currentUser, ...data };
-    
-    console.log("--- [FRONTEND LOG 5] currentUser SAU KHI cập nhật sẽ là:", updatedUser);
     setCurrentUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
+  // --- THÊM HÀM LOGOUT MỚI ---
+  const logout = async () => {
+    await makeRequest.post("/auth/logout");
+    setCurrentUser(null); // Set user về null ở frontend
+  };
+
   useEffect(() => {
-    // Không cần log ở đây để tránh nhiễu
+    // Sửa lại logic để xóa item khỏi localStorage khi logout
+    if (currentUser === null) {
+      localStorage.removeItem("user");
+    } else {
+      localStorage.setItem("user", JSON.stringify(currentUser));
+    }
   }, [currentUser]);
-  
-  // Dòng log này sẽ cho thấy mỗi khi Context Provider render lại
-  console.log("AuthContext Provider is rendering. Current user is:", currentUser?.name);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, updateUser }}>
+    // Thêm `logout` vào Provider
+    <AuthContext.Provider value={{ currentUser, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

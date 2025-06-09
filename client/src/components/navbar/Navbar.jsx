@@ -7,14 +7,25 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import { Link } from "react-router-dom";
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { AuthContext } from "../../context/authContext";
 
 const Navbar = () => {
   const { toggle, darkMode } = useContext(DarkModeContext);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="navbar">
@@ -22,7 +33,12 @@ const Navbar = () => {
         <Link to="/" style={{ textDecoration: "none" }}>
           <span>My social</span>
         </Link>
-        <HomeOutlinedIcon />
+        
+        {/* --- THÊM LINK CHO ICON HOME Ở ĐÂY --- */}
+        <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+          <HomeOutlinedIcon />
+        </Link>
+        
         {darkMode ? (
           <WbSunnyOutlinedIcon onClick={toggle} />
         ) : (
@@ -38,13 +54,15 @@ const Navbar = () => {
         <PersonOutlinedIcon />
         <EmailOutlinedIcon />
         <NotificationsOutlinedIcon />
+        <LogoutOutlinedIcon className="logout-icon" onClick={handleLogout}/>
         <div className="user">
-          {/* *** THAY ĐỔI DUY NHẤT NẰM Ở ĐÂY *** */}
-          <img
-            src={currentUser.profilePic ? `/upload/${currentUser.profilePic}?${new Date().getTime()}` : "/path/to/default/avatar.png"}
-            alt=""
-          />
-          <span>{currentUser.name}</span>
+          <Link to={`/profile/${currentUser.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img
+              src={currentUser.profilePic ? `/upload/${currentUser.profilePic}` : "/path/to/default/avatar.png"}
+              alt=""
+            />
+            <span>{currentUser.name}</span>
+          </Link>
         </div>
       </div>
     </div>

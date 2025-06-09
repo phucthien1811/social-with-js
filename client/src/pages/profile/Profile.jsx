@@ -2,8 +2,6 @@ import "./profile.scss";
 import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
-// import PinterestIcon from "@mui/icons-material/Pinterest";
-// import TwitterIcon from "@mui/icons-material/Twitter";
 import PlaceIcon from "@mui/icons-material/Place";
 import LanguageIcon from "@mui/icons-material/Language";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -22,45 +20,47 @@ const Profile = () => {
 
   const userId = parseInt(useLocation().pathname.split("/")[2]);
 
-  // Sửa Query Key để nó là duy nhất cho mỗi user
-  const { isLoading, error, data } = useQuery(["user", userId], () =>
-    makeRequest.get("/users/find/" + userId).then((res) => {
-      return res.data;
-    })
+  const { isLoading, error, data } = useQuery(
+    ["user", userId],
+    () => makeRequest.get("/users/find/" + userId).then((res) => res.data),
+    {
+      enabled: !!userId,
+    }
   );
 
   const { isLoading: rIsLoading, data: relationshipData } = useQuery(
-    ["relationship", userId], // Thêm userId vào đây
-    () =>
-      makeRequest.get("/relationships?followedUserId=" + userId).then((res) => {
-        return res.data;
-      })
+    ["relationship", userId],
+    () => makeRequest.get("/relationships?followedUserId=" + userId).then((res) => res.data),
+    {
+        enabled: !!userId,
+    }
   );
 
   const queryClient = useQueryClient();
 
   const mutation = useMutation(
     (following) => {
-      if (following)
-        return makeRequest.delete("/relationships?userId=" + userId);
+      if (following) return makeRequest.delete("/relationships?userId=" + userId);
       return makeRequest.post("/relationships", { userId });
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["relationship", userId]); // Sửa cả ở đây
+        queryClient.invalidateQueries(["relationship", userId]);
       },
     }
   );
 
   const handleFollow = () => {
-    mutation.mutate(relationshipData.includes(currentUser.id));
+    if (relationshipData) {
+        mutation.mutate(relationshipData.includes(currentUser.id));
+    }
   };
 
   return (
     <div className="profile">
-      {isLoading ? (
-        "loading"
-      ) : (
+      {error ? "Something went wrong!" 
+      : (isLoading ? "loading" 
+      : ( data && // Thêm kiểm tra data tồn tại để tránh crash
         <>
           <div className="images">
             <img src={"/upload/" + data.coverPic} alt="" className="cover" />
@@ -68,8 +68,8 @@ const Profile = () => {
           </div>
           <div className="profileContainer">
             <div className="uInfo">
+              {/* --- ĐOẠN CODE ICON ĐÃ ĐƯỢC KHÔI PHỤC ĐẦY ĐỦ --- */}
               <div className="left">
-                {/* --- ĐÃ KHÔI PHỤC LẠI ĐOẠN CODE HIỂN THỊ ICON --- */}
                 <a href="http://facebook.com">
                   <FacebookTwoToneIcon fontSize="large" />
                 </a>
@@ -79,9 +79,6 @@ const Profile = () => {
                 <a href="#">
                   <LinkedInIcon fontSize="large" />
                 </a>
-                {/* Bạn có thể bỏ comment nếu muốn dùng các icon này */}
-                {/* <a href="#"><TwitterIcon fontSize="large" /></a> */}
-                {/* <a href="#"><PinterestIcon fontSize="large" /></a> */}
               </div>
               <div className="center">
                 <span>{data.name}</span>
@@ -95,29 +92,27 @@ const Profile = () => {
                     <span>{data.website}</span>
                   </div>
                 </div>
-                {rIsLoading ? (
-                  "loading"
-                ) : userId === currentUser.id ? (
-                  <button onClick={() => setOpenUpdate(true)}>update</button>
+                {rIsLoading ? ( "loading" ) 
+                : (userId === currentUser.id ? (
+                  <button onClick={() => setOpenUpdate(true)}>Update</button>
                 ) : (
                   <button onClick={handleFollow}>
-                    {relationshipData.includes(currentUser.id)
+                    {relationshipData && relationshipData.includes(currentUser.id)
                       ? "Following"
                       : "Follow"}
                   </button>
-                )}
+                ))}
               </div>
               <div className="right">
                 <EmailOutlinedIcon />
                 <MoreVertIcon />
               </div>
             </div>
-            {/* Truyền userId đã lấy được xuống đây */}
             <Posts userId={userId} />
           </div>
         </>
-      )}
-      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}
+      ))}
+      {openUpdate && data && <Update setOpenUpdate={setOpenUpdate} user={data} />}
     </div>
   );
 };
