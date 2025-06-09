@@ -1,117 +1,138 @@
 @import "../../style.scss";
 
+// Container ngoài cùng để căn giữa thanh story
 .stories {
   display: flex;
-  gap: 10px;
-  height: 250px;
-  margin-bottom: 30px;
-  overflow-x: auto;
-  &::-webkit-scrollbar { display: none; }
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  @include mobile {
-    height: 50px;
-    margin-bottom: 0;
-    justify-content: flex-start;
-  }
-
-  @include tablet {
-    height: 150px;
-    gap: 20px;
-  }
-
-  .story {
-    width: 140px;
-    flex-shrink: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-
-    @include mobile {
-      flex: none;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    span {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      color: white;
-      font-weight: 500;
-      @include mobile {
-        display: none;
-      }
-    }
-
-    // THAY THẾ TOÀN BỘ SELECTOR `button` BẰNG `label`
-    label {
-      position: absolute;
-      bottom: 40px;
-      left: 10px;
-      color: white;
-      background-color: #5271ff;
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      font-size: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 0;
-
-      @include mobile {
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        margin: auto;
-      }
-    }
-  }
+  justify-content: center;
+  width: 100%;
 }
-// Dán toàn bộ đoạn code này vào cuối file stories.scss của bạn
 
+// Container chính, để định vị cho các nút bấm và có chiều rộng cố định
+.stories-container {
+  // Chiều rộng = (width + gap) * 5 story - gap cuối cùng
+  // (140 + 10) * 5 - 10 = 740px
+  width: 740px; 
+  position: relative;
+  margin-bottom: 20px;
+}
+
+// KHUNG NHÌN - Phần quan trọng nhất, nó sẽ ẩn đi các story thừa
+.stories-viewport {
+  width: 100%;
+  height: 250px; // Chiều cao của thanh story
+  overflow: hidden; // ẨN ĐI TẤT CẢ NHỮNG GÌ BÊN NGOÀI KHUNG NÀY
+}
+
+// Wrapper chứa tất cả các story, đây là thanh sẽ di chuyển
+.stories-wrapper {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+  
+  // Thêm hiệu ứng chuyển động mượt mà khi di chuyển
+  transition: transform 0.5s ease-in-out; 
+}
+
+// Style cho một story đơn lẻ
 .story {
-  // ... các style cũ của bạn ở đây ...
+  width: 140px;
+  flex-shrink: 0; // Đảm bảo story không bị co lại
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
 
-  // Style cho icon "3 chấm"
-  .more-icon {
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  span {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    bottom: 10px;
+    left: 10px;
     color: white;
+    font-weight: 500;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  }
+  
+  // Style cho các nút bên trong story (add, delete, more)
+  label { /* Nút cộng */
+    position: absolute;
+    bottom: 40px;
+    left: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #5271ff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 2px solid white;
     cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .more-icon { /* Nút 3 chấm */
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: white;
+    background-color: rgba(0,0,0,0.4);
     border-radius: 50%;
     padding: 2px;
   }
-
-  // Style cho nút "Delete"
-  .delete-button {
+  
+  .delete-button { /* Nút xóa */
     position: absolute;
-    top: 40px; // Hiện ra ngay dưới nút 3 chấm
-    right: 10px;
-    border: none;
-    background-color: #f0544f; // Màu đỏ
+    top: 40px;
+    right: 8px;
+    background-color: #f0544f;
     color: white;
-    padding: 5px 10px;
+    border: none;
     border-radius: 5px;
-    cursor: pointer;
+    padding: 5px 8px;
     font-size: 12px;
+    cursor: pointer;
+    z-index: 2;
+  }
+}
 
-    &:hover {
-      background-color: #d63d39;
-    }
+// Style cho 2 nút bấm qua lại
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  z-index: 2;
+
+  @include themify($themes) {
+    background-color: themed("bgSoft");
+    border: 1px solid themed("border");
+    .MuiSvgIcon-root { color: themed("textColor"); }
+  }
+
+  .MuiSvgIcon-root {
+    font-size: 16px;
+  }
+
+  &.prev {
+    left: -15px;
+  }
+  &.next {
+    right: -15px;
+  }
+  
+  @include mobile {
+    display: none;
   }
 }
