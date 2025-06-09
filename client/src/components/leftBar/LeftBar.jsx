@@ -16,7 +16,6 @@ import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
 
 const LeftBar = () => {
-
   const { currentUser } = useContext(AuthContext);
 
   return (
@@ -24,8 +23,9 @@ const LeftBar = () => {
       <div className="container">
         <div className="menu">
           <div className="user">
+             {/* *** THAY ĐỔI DUY NHẤT NẰM Ở ĐÂY *** */}
             <img
-              src={"/upload/" +currentUser.profilePic}
+              src={currentUser.profilePic ? `/upload/${currentUser.profilePic}?${new Date().getTime()}` : "/path/to/default/avatar.png"}
               alt=""
             />
             <span>{currentUser.name}</span>
@@ -34,6 +34,7 @@ const LeftBar = () => {
             <img src={Friends} alt="" />
             <span>Friends</span>
           </div>
+          {/* Các item khác giữ nguyên */}
           <div className="item">
             <img src={Groups} alt="" />
             <span>Groups</span>
@@ -54,6 +55,7 @@ const LeftBar = () => {
         <hr />
         <div className="menu">
           <span>Your shortcuts</span>
+          {/* Các item khác giữ nguyên */}
           <div className="item">
             <img src={Events} alt="" />
             <span>Events</span>
@@ -78,6 +80,7 @@ const LeftBar = () => {
         <hr />
         <div className="menu">
           <span>Others</span>
+           {/* Các item khác giữ nguyên */}
           <div className="item">
             <img src={Fund} alt="" />
             <span>Fundraiser</span>

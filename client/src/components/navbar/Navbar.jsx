@@ -39,8 +39,9 @@ const Navbar = () => {
         <EmailOutlinedIcon />
         <NotificationsOutlinedIcon />
         <div className="user">
+          {/* *** THAY ĐỔI DUY NHẤT NẰM Ở ĐÂY *** */}
           <img
-            src={"/upload/" + currentUser.profilePic}
+            src={currentUser.profilePic ? `/upload/${currentUser.profilePic}?${new Date().getTime()}` : "/path/to/default/avatar.png"}
             alt=""
           />
           <span>{currentUser.name}</span>

@@ -9,19 +9,30 @@ export const AuthContextProvider = ({ children }) => {
   );
 
   const login = async (inputs) => {
-    const res = await axios.post("http://localhost:8800/api/auth/login", inputs, {
-      withCredentials: true,
-    });
+    const res = await axios.post("http://localhost:8800/api/auth/login", inputs);
+    setCurrentUser(res.data);
+  };
 
-    setCurrentUser(res.data)
+  const updateUser = (data) => {
+    console.log("--- [FRONTEND LOG 3] Hàm updateUser trong Context được gọi với data:", data);
+    console.log("--- [FRONTEND LOG 4] currentUser TRƯỚC KHI cập nhật:", currentUser);
+    
+    const updatedUser = { ...currentUser, ...data };
+    
+    console.log("--- [FRONTEND LOG 5] currentUser SAU KHI cập nhật sẽ là:", updatedUser);
+    setCurrentUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(currentUser));
+    // Không cần log ở đây để tránh nhiễu
   }, [currentUser]);
+  
+  // Dòng log này sẽ cho thấy mỗi khi Context Provider render lại
+  console.log("AuthContext Provider is rendering. Current user is:", currentUser?.name);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login }}>
+    <AuthContext.Provider value={{ currentUser, login, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
