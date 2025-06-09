@@ -3,9 +3,13 @@ import "./posts.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 
-const Posts = ({userId}) => {
-  const { isLoading, error, data } = useQuery(["posts"], () =>
-    makeRequest.get("/posts?userId="+userId).then((res) => {
+const Posts = ({ userId }) => {
+  // Nếu có userId, API sẽ là "/posts?userId=...".
+  // Nếu không có userId (ở trang chủ), API sẽ là "/posts" để lấy bài của bạn bè.
+  const endpoint = userId ? "/posts?userId=" + userId : "/posts";
+
+  const { isLoading, error, data } = useQuery(["posts", userId], () =>
+    makeRequest.get(endpoint).then((res) => {
       return res.data;
     })
   );
