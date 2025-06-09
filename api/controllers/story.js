@@ -10,24 +10,25 @@ export const getStories = (req, res) => {
     if (err) return res.status(403).json("Token is not valid!");
 
     // =======================================================
-    // DÙNG CÂU LỆNH SQL ĐƠN GIẢN HƠN RẤT NHIỀU ĐỂ TEST
-    // Câu lệnh này chỉ lấy story của CHÍNH BẠN (người đang đăng nhập)
+    // LOGIC HOÀN CHỈNH - LẤY STORY CỦA BẠN VÀ BẠN BÈ
     // =======================================================
+    // Câu lệnh này sẽ lấy story của chính người dùng (s.userId = ?)
+    // HOẶC story của những người mà người dùng đang follow (r.followerUserId = ?)
     const q = `
-      SELECT s.*, u.name 
+      SELECT DISTINCT s.*, u.name 
       FROM stories AS s 
-      JOIN users AS u ON (u.id = s.userId) 
-      WHERE s.userId = ? 
+      JOIN users AS u ON (u.id = s.userId)
+      LEFT JOIN relationships AS r ON (s.userId = r.followedUserId) 
+      WHERE r.followerUserId = ? OR s.userId = ?
       ORDER BY s.createdAt DESC
     `;
 
-    // Chúng ta chỉ cần truyền ID của người dùng vào
-    const values = [userInfo.id];
+    // Chúng ta cần truyền ID của người dùng vào cả hai vị trí `?`
+    const values = [userInfo.id, userInfo.id];
 
     db.query(q, values, (err, data) => {
-      // Nếu có lỗi ở đây, nó sẽ hiện trong terminal của backend
       if (err) {
-        console.error("LỖI SQL KHI LẤY STORY:", err);
+        console.error("LỖI SQL KHI LẤY STORY BẠN BÈ:", err);
         return res.status(500).json(err);
       }
       return res.status(200).json(data);

@@ -9,22 +9,22 @@ export const getPosts = (req, res) => {
   jwt.verify(token, "secretkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
 
-    // --- LOGIC ĐÃ ĐƯỢC SỬA LẠI HOÀN CHỈNH ---
     const userId = req.query.userId;
     
-    // Nếu có userId (tức là đang ở trang profile), thì chỉ lấy bài của user đó.
-    // Nếu không có userId (tức là đang ở trang home), thì lấy bài của user và những người user follow.
-    const q =
-      userId 
-        ? `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.createdAt DESC`
-        : `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId)
-    LEFT JOIN relationships AS r ON (p.userId = r.followedUserId) WHERE r.followerUserId = ? OR p.userId = ?
-    ORDER BY p.createdAt DESC`;
+    // --- LOGIC LẤY BÀI VIẾT ĐÃ ĐƯỢC SỬA LẠI HOÀN CHỈNH ---
 
-    // Nếu có userId, giá trị là [userId].
-    // Nếu không, giá trị là [id của người đang đăng nhập, id của người đang đăng nhập].
+    // Nếu ở trang cá nhân (có userId), chỉ lấy bài của người đó.
+    // Nếu ở trang chủ (không có userId), lấy bài của bạn VÀ những người bạn đang follow.
+    // Sử dụng subquery để logic rõ ràng và chính xác hơn.
+    const q =
+      userId && userId !== "undefined"
+        ? `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.createdAt DESC`
+        : `SELECT DISTINCT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId)
+           WHERE p.userId = ? OR p.userId IN (SELECT followedUserId FROM relationships WHERE followerUserId = ?)
+           ORDER BY p.createdAt DESC`;
+
     const values =
-      userId ? [userId] : [userInfo.id, userInfo.id];
+      userId && userId !== "undefined" ? [userId] : [userInfo.id, userInfo.id];
 
     db.query(q, values, (err, data) => {
       if (err) return res.status(500).json(err);
@@ -33,8 +33,7 @@ export const getPosts = (req, res) => {
   });
 };
 
-
-// Các hàm khác như addPost, deletePost giữ nguyên
+// Hàm addPost đã đúng, giữ nguyên
 export const addPost = (req, res) => {
   const token = req.cookies.accessToken;
   if (!token) return res.status(401).json("Not logged in!");
@@ -58,6 +57,7 @@ export const addPost = (req, res) => {
   });
 };
 
+// Hàm deletePost đã đúng, giữ nguyên
 export const deletePost = (req, res) => {
     const token = req.cookies.accessToken;
     if (!token) return res.status(401).json("Not logged in!");
