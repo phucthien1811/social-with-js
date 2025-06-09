@@ -10,6 +10,7 @@ import postRoutes from "./routes/posts.js";
 import commentRoutes from "./routes/comments.js";
 import likeRoutes from "./routes/likes.js";
 import relationshipRoutes from "./routes/relationships.js";
+import storyRoutes from "./routes/stories.js"
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/relationships", relationshipRoutes);
+app.use("/api/stories", storyRoutes);
 
 app.listen(8800, () => {
   console.log("API server is running!");
