@@ -17,26 +17,20 @@ import Update from "../../components/update/Update";
 const Profile = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const { currentUser } = useContext(AuthContext);
-
   const userId = parseInt(useLocation().pathname.split("/")[2]);
+  const queryClient = useQueryClient();
 
   const { isLoading, error, data } = useQuery(
     ["user", userId],
     () => makeRequest.get("/users/find/" + userId).then((res) => res.data),
-    {
-      enabled: !!userId,
-    }
+    { enabled: !!userId }
   );
 
   const { isLoading: rIsLoading, data: relationshipData } = useQuery(
     ["relationship", userId],
     () => makeRequest.get("/relationships?followedUserId=" + userId).then((res) => res.data),
-    {
-        enabled: !!userId,
-    }
+    { enabled: !!userId }
   );
-
-  const queryClient = useQueryClient();
 
   const mutation = useMutation(
     (following) => {
@@ -45,14 +39,20 @@ const Profile = () => {
     },
     {
       onSuccess: () => {
+        // --- BƯỚC SỬA LỖI QUAN TRỌNG NHẤT ---
+        // Sau khi follow/unfollow thành công, làm mới tất cả các dữ liệu liên quan
+        
         queryClient.invalidateQueries(["relationship", userId]);
+        queryClient.invalidateQueries(["posts"]);
+        queryClient.invalidateQueries(["stories"]);
+        queryClient.invalidateQueries(["suggestedUsers"]); // <--- THÊM DÒNG NÀY
       },
     }
   );
 
   const handleFollow = () => {
     if (relationshipData) {
-        mutation.mutate(relationshipData.includes(currentUser.id));
+      mutation.mutate(relationshipData.includes(currentUser.id));
     }
   };
 
@@ -60,7 +60,7 @@ const Profile = () => {
     <div className="profile">
       {error ? "Something went wrong!" 
       : (isLoading ? "loading" 
-      : ( data && // Thêm kiểm tra data tồn tại để tránh crash
+      : ( data &&
         <>
           <div className="images">
             <img src={"/upload/" + data.coverPic} alt="" className="cover" />
@@ -68,31 +68,18 @@ const Profile = () => {
           </div>
           <div className="profileContainer">
             <div className="uInfo">
-              {/* --- ĐOẠN CODE ICON ĐÃ ĐƯỢC KHÔI PHỤC ĐẦY ĐỦ --- */}
               <div className="left">
-                <a href="http://facebook.com">
-                  <FacebookTwoToneIcon fontSize="large" />
-                </a>
-                <a href="#">
-                  <InstagramIcon fontSize="large" />
-                </a>
-                <a href="#">
-                  <LinkedInIcon fontSize="large" />
-                </a>
+                <a href="http://facebook.com"><FacebookTwoToneIcon fontSize="large" /></a>
+                <a href="#"><InstagramIcon fontSize="large" /></a>
+                <a href="#"><LinkedInIcon fontSize="large" /></a>
               </div>
               <div className="center">
                 <span>{data.name}</span>
                 <div className="info">
-                  <div className="item">
-                    <PlaceIcon />
-                    <span>{data.city}</span>
-                  </div>
-                  <div className="item">
-                    <LanguageIcon />
-                    <span>{data.website}</span>
-                  </div>
+                  <div className="item"><PlaceIcon /><span>{data.city}</span></div>
+                  <div className="item"><LanguageIcon /><span>{data.website}</span></div>
                 </div>
-                {rIsLoading ? ( "loading" ) 
+                {rIsLoading ? "loading" 
                 : (userId === currentUser.id ? (
                   <button onClick={() => setOpenUpdate(true)}>Update</button>
                 ) : (

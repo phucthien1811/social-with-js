@@ -8,31 +8,37 @@ import moment from "moment";
 const Comments = ({ postId }) => {
   const [desc, setDesc] = useState("");
   const { currentUser } = useContext(AuthContext);
-
-  const { isLoading, error, data } = useQuery(["comments"], () =>
-    makeRequest.get("/comments?postId=" + postId).then((res) => {
-      return res.data;
-    })
-  );
-
   const queryClient = useQueryClient();
 
+  // --- SỬA LỖI 1: THÊM postId VÀO QUERY KEY ---
+  // "Khóa" giờ đây là duy nhất cho mỗi bài viết, ví dụ: ["comments", 1], ["comments", 2]
+  const { isLoading, error, data } = useQuery(
+    ["comments", postId], 
+    () =>
+      makeRequest.get("/comments?postId=" + postId).then((res) => {
+        return res.data;
+      })
+  );
+
+  // Mutation để thêm bình luận mới
   const mutation = useMutation(
     (newComment) => {
       return makeRequest.post("/comments", newComment);
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries(["comments"]);
+        // --- SỬA LỖI 2: INVALIDATE ĐÚNG QUERY KEY ---
+        // Làm mới danh sách bình luận của đúng bài viết này thôi
+        queryClient.invalidateQueries(["comments", postId]);
       },
     }
   );
 
   const handleClick = async (e) => {
     e.preventDefault();
+    if (!desc.trim()) return; // Không gửi comment rỗng
     mutation.mutate({ desc, postId });
-    setDesc("");
+    setDesc(""); // Xóa nội dung trong ô input sau khi gửi
   };
 
   return (
@@ -52,7 +58,7 @@ const Comments = ({ postId }) => {
         : isLoading
         ? "loading"
         : data.map((comment) => (
-            <div className="comment">
+            <div className="comment" key={comment.id}>
               <img src={"/upload/" + comment.profilePic} alt="" />
               <div className="info">
                 <span>{comment.name}</span>

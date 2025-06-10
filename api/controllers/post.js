@@ -33,7 +33,7 @@ export const getPosts = (req, res) => {
   });
 };
 
-// Hàm addPost đã đúng, giữ nguyên
+// Hàm addPost 
 export const addPost = (req, res) => {
   const token = req.cookies.accessToken;
   if (!token) return res.status(401).json("Not logged in!");
@@ -52,26 +52,46 @@ export const addPost = (req, res) => {
 
     db.query(q, [values], (err, data) => {
       if (err) return res.status(500).json(err);
+      
+      // --- THÊM ĐOẠN CODE NÀY VÀO ---
+      // Sau khi tạo post thành công, tạo một thông báo hoạt động tương ứng
+      const notificationQuery = "INSERT INTO notifications (`type`, `actorId`, `entityId`, `createdAt`) VALUES (?)";
+      // `entityId` sẽ là ID của bài viết vừa được tạo
+      const notificationValues = [
+        'post',
+        userInfo.id,
+        data.insertId, 
+        moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+      ];
+      // Chạy query này nhưng không cần chờ kết quả
+      db.query(notificationQuery, [notificationValues]);
+      // --- KẾT THÚC PHẦN THÊM ---
+
       return res.status(200).json("Post has been created.");
     });
   });
 };
 
-// Hàm deletePost đã đúng, giữ nguyên
+// Hàm deletePost 
 export const deletePost = (req, res) => {
-    const token = req.cookies.accessToken;
-    if (!token) return res.status(401).json("Not logged in!");
-  
-    jwt.verify(token, "secretkey", (err, userInfo) => {
-      if (err) return res.status(403).json("Token is not valid!");
-  
-      const q =
-        "DELETE FROM posts WHERE `id`=? AND `userId` = ?";
-  
-      db.query(q, [req.params.id, userInfo.id], (err, data) => {
-        if (err) return res.status(500).json(err);
-        if(data.affectedRows>0) return res.status(200).json("Post has been deleted.");
-        return res.status(403).json("You can delete only your post")
-      });
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!");
+
+  jwt.verify(token, "secretkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    // --- LOGIC MỚI ---
+    const deletePostQuery = "DELETE FROM posts WHERE `id`=? AND `userId` = ?";
+    db.query(deletePostQuery, [req.params.id, userInfo.id], (err, data) => {
+      if (err) return res.status(500).json(err);
+      if (data.affectedRows > 0) {
+        // Xóa tất cả thông báo có liên quan đến postId này
+        const deleteNotificationsQuery = "DELETE FROM notifications WHERE `entityId` = ?";
+        db.query(deleteNotificationsQuery, [req.params.id]);
+
+        return res.status(200).json("Post has been deleted.");
+      }
+      return res.status(403).json("You can delete only your post");
     });
-  };
+  });
+};

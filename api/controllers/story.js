@@ -36,7 +36,7 @@ export const getStories = (req, res) => {
   });
 };
 
-// Các hàm addStory và deleteStory giữ nguyên, không có lỗi
+// Các hàm addStory và deleteStory 
 export const addStory = (req, res) => {
   const token = req.cookies.accessToken;
   if (!token) return res.status(401).json("Not logged in!");
@@ -53,6 +53,21 @@ export const addStory = (req, res) => {
 
     db.query(q, [values], (err, data) => {
       if (err) return res.status(500).json(err);
+      
+      // --- THÊM ĐOẠN CODE NÀY VÀO ---
+      // Sau khi tạo story thành công, tạo một thông báo hoạt động
+      const notificationQuery = "INSERT INTO notifications (`type`, `actorId`, `entityId`, `createdAt`) VALUES (?)";
+      // `entityId` sẽ là ID của story vừa được tạo
+      const notificationValues = [
+        'story', // Thêm một type mới là 'story'
+        userInfo.id,
+        data.insertId, 
+        moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+      ];
+      // Chạy query này nhưng không cần chờ kết quả
+      db.query(notificationQuery, [notificationValues]);
+      // --- KẾT THÚC PHẦN THÊM ---
+
       return res.status(200).json("Story has been created.");
     });
   });
@@ -65,12 +80,17 @@ export const deleteStory = (req, res) => {
   jwt.verify(token, "secretkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
 
-    const q = "DELETE FROM stories WHERE `id`=? AND `userId` = ?";
-
-    db.query(q, [req.params.id, userInfo.id], (err, data) => {
+    // --- LOGIC MỚI ---
+    const deleteStoryQuery = "DELETE FROM stories WHERE `id`=? AND `userId` = ?";
+    db.query(deleteStoryQuery, [req.params.id, userInfo.id], (err, data) => {
       if (err) return res.status(500).json(err);
-      if (data.affectedRows > 0)
+      if (data.affectedRows > 0) {
+        // Xóa thông báo tương ứng
+        const deleteNotificationQuery = "DELETE FROM notifications WHERE `type` = 'story' AND `entityId` = ?";
+        db.query(deleteNotificationQuery, [req.params.id]);
+
         return res.status(200).json("Story has been deleted.");
+      }
       return res.status(403).json("You can delete only your story!");
     });
   });
