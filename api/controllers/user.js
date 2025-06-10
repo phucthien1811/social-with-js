@@ -53,3 +53,34 @@ export const updateUser = (req, res) => {
     });
   });
 };
+export const getSuggestedUsers = (req, res) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!");
+
+  jwt.verify(token, "secretkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    // Câu lệnh SQL này sẽ:
+    // 1. Lấy tất cả user (u.id)
+    // 2. TRỪ ĐI chính user hiện tại (u.id != ?)
+    // 3. TRỪ ĐI những user mà user hiện tại đã follow (u.id NOT IN (...))
+    // 4. Lấy ngẫu nhiên 5 người (RAND()) và giới hạn kết quả (LIMIT 5)
+    const q = `
+      SELECT id, username, profilePic, name 
+      FROM users 
+      WHERE id != ? AND id NOT IN (
+        SELECT followedUserId FROM relationships WHERE followerUserId = ?
+      ) 
+      ORDER BY RAND() 
+      LIMIT 5
+    `;
+
+    const values = [userInfo.id, userInfo.id];
+
+    db.query(q, values, (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.status(200).json(data);
+    });
+  });
+};
+
