@@ -60,11 +60,8 @@ export const getSuggestedUsers = (req, res) => {
   jwt.verify(token, "secretkey", (err, userInfo) => {
     if (err) return res.status(403).json("Token is not valid!");
 
-    // Câu lệnh SQL này sẽ:
-    // 1. Lấy tất cả user (u.id)
-    // 2. TRỪ ĐI chính user hiện tại (u.id != ?)
-    // 3. TRỪ ĐI những user mà user hiện tại đã follow (u.id NOT IN (...))
-    // 4. Lấy ngẫu nhiên 5 người (RAND()) và giới hạn kết quả (LIMIT 5)
+    // --- SỬA LẠI LIMIT TỪ 5 THÀNH 10 ---
+    // Lấy về một danh sách lớn hơn để frontend có dữ liệu dự trữ
     const q = `
       SELECT id, username, profilePic, name 
       FROM users 
@@ -72,7 +69,7 @@ export const getSuggestedUsers = (req, res) => {
         SELECT followedUserId FROM relationships WHERE followerUserId = ?
       ) 
       ORDER BY RAND() 
-      LIMIT 5
+      LIMIT 10
     `;
 
     const values = [userInfo.id, userInfo.id];
@@ -83,4 +80,3 @@ export const getSuggestedUsers = (req, res) => {
     });
   });
 };
-
