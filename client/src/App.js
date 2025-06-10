@@ -15,22 +15,31 @@ import "./style.scss";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
+import { useQuery } from "@tanstack/react-query"; // Thêm import
+import { makeRequest } from "./axios"; // Thêm import
 
 function App() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
 
-  // Layout giờ đây chỉ chứa các thành phần giao diện
+  // --- LOGIC MỚI: GỌI API Ở COMPONENT CHA ---
   const Layout = () => {
+    // Gọi API để lấy tất cả thông báo ở đây, đúng một lần duy nhất
+    const { isLoading, error, data: notifications } = useQuery(["notifications"], () =>
+      makeRequest.get("/notifications").then((res) => res.data)
+    );
+
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <Navbar />
+        {/* Truyền dữ liệu notifications xuống cho Navbar */}
+        <Navbar notifications={notifications} />
         <div style={{ display: "flex" }}>
           <LeftBar />
           <div style={{ flex: 6 }}>
             <Outlet />
           </div>
-          <RightBar />
+          {/* Truyền dữ liệu notifications xuống cho RightBar */}
+          <RightBar notifications={notifications} isLoading={isLoading} error={error} />
         </div>
       </div>
     );
@@ -52,24 +61,12 @@ function App() {
         </ProtectedRoute>
       ),
       children: [
-        {
-          path: "/",
-          element: <Home />,
-        },
-        {
-          path: "/profile/:id",
-          element: <Profile />,
-        },
+        { path: "/", element: <Home /> },
+        { path: "/profile/:id", element: <Profile /> },
       ],
     },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/register",
-      element: <Register />,
-    },
+    { path: "/login", element: <Login /> },
+    { path: "/register", element: <Register /> },
   ]);
 
   return (

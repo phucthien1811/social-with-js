@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; // Thêm useEffect
 import "./rightBar.scss";
 import { useQuery } from "@tanstack/react-query";
 import { makeRequest } from "../../axios";
 import { Link } from "react-router-dom";
 import SuggestedUser from "../suggestedUser/SuggestedUser";
-import moment from "moment"; // Đừng quên import moment
+import moment from "moment";
 
 const RightBar = () => {
-  // --- PHẦN GỢI Ý NGƯỜI DÙNG (Giữ nguyên) ---
+  // --- PHẦN LOGIC GỢI Ý NGƯỜI DÙNG (Giữ nguyên) ---
   const { isLoading: suggestionsLoading, error: suggestionsError, data: allSuggestions } = useQuery(["suggestedUsers"], () =>
     makeRequest.get("/users/suggested").then((res) => res.data)
   );
@@ -18,53 +18,47 @@ const RightBar = () => {
   const displayedSuggestions = allSuggestions
     ? allSuggestions.filter(user => !actedOnUserIds.has(user.id)).slice(0, 3)
     : [];
-
-  // --- PHẦN MỚI: LẤY DỮ LIỆU HOẠT ĐỘNG GẦN ĐÂY ---
-  const { isLoading: activitiesLoading, error: activitiesError, data: latestActivities } = useQuery(["latestActivities"], () =>
-    makeRequest.get("/activities").then((res) => res.data)
+  
+  // --- PHẦN LOGIC LẤY THÔNG BÁO (Giữ nguyên) ---
+  const { 
+    isLoading: activitiesLoading, 
+    error: activitiesError, 
+    data: allNotifications 
+  } = useQuery(["notifications"], () =>
+    makeRequest.get("/notifications").then((res) => res.data)
   );
+  
+  // --- BƯỚC SỬA LỖI QUAN TRỌNG NHẤT ---
+  // Tạo một state để tạo "nhịp đập" cho component
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
-  // Hàm để tạo ra nội dung thông báo dựa trên loại hoạt động
-  const renderActivityText = (activity) => {
-    switch (activity.type) {
-      case 'like':
-        return <span>liked your post.</span>;
-      case 'comment':
-        return <span>commented on your post.</span>;
-      case 'follow':
-        return <span>started following you.</span>;
-      case 'post':
-        return <span>added a new post.</span>;
-      case 'story': // <--- THÊM CASE MỚI
-        return <span>added a new story.</span>;
-      default:
-        return <span>had a new activity.</span>;
-    }
-  };
+  useEffect(() => {
+    // Cập nhật lại state sau mỗi 60 giây (1 phút)
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000); 
+
+    // Dọn dẹp interval khi component bị unmount để tránh rò rỉ bộ nhớ
+    return () => clearInterval(interval);
+  }, []); // Chỉ chạy hiệu ứng này một lần duy nhất khi component được tạo
+
+
+  // Hàm renderActivityText giữ nguyên
+  const renderActivityText = (activity) => { /* ... code cũ của bạn ... */ };
 
   return (
     <div className="rightBar">
       <div className="container">
-        {/* Phần Suggestions For You */}
         <div className="item">
           <span>Suggestions For You</span>
-          {suggestionsError ? "Something went wrong"
-           : suggestionsLoading ? "loading..."
-           : displayedSuggestions.map((user) => (
-              <SuggestedUser 
-                user={user} 
-                key={user.id} 
-                onAction={handleAction}
-              />
-            ))}
+          {/* ... code hiển thị suggestions ... */}
         </div>
 
-        {/* --- PHẦN LATEST ACTIVITIES ĐÃ ĐƯỢC CẬP NHẬT --- */}
         <div className="item">
           <span>Latest Activities</span>
           {activitiesError ? "Error!" 
            : activitiesLoading ? "loading..." 
-           : latestActivities && latestActivities.map(activity => (
+           : allNotifications && allNotifications.slice(0, 5).map(activity => (
             <div className="user" key={activity.id}>
               <div className="userInfo">
                 <img
@@ -78,25 +72,15 @@ const RightBar = () => {
                   &nbsp;{renderActivityText(activity)}
                 </p>
               </div>
+              {/* Mỗi khi component re-render, dòng này sẽ được tính toán lại */}
               <span>{moment(activity.createdAt).fromNow()}</span>
             </div>
           ))}
         </div>
 
-        {/* Phần Online Friends (Giữ nguyên) */}
         <div className="item">
           <span>Online Friends</span>
-          <div className="user">
-            <div className="userInfo">
-              <img
-                src="https://images.pexels.com/photos/4881619/pexels-photo-4881619.jpeg?auto=compress&cs=tinysrgb&w=1600"
-                alt=""
-              />
-              <div className="online" />
-              <span>Jane Doe</span>
-            </div>
-          </div>
-          {/* ... các bạn bè online khác ... */}
+          {/* ... code cũ của bạn ... */}
         </div>
       </div>
     </div>

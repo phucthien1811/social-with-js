@@ -24,30 +24,14 @@
         font-size: 20px;
         color: themed("logo");
       }
-      
-      // --- STYLE CHO CÁC ICON CÓ THỂ BẤM VÀO ---
-      a {
-        display: flex; // Cần thiết để căn chỉnh icon
-        align-items: center;
-      }
 
-      .MuiSvgIcon-root {
-        cursor: pointer;
-        transition: color 0.3s ease;
-        &:hover {
-          color: themed("logo");
-        }
-      }
-
-      // --- THANH TÌM KIẾM ĐÃ ĐƯỢC THIẾT KẾ LẠI ---
       .search {
         display: flex;
         align-items: center;
         gap: 10px;
-        background-color: themed("bgSoft"); // Dùng màu nền mềm hơn
         border: 1px solid themed("border");
-        border-radius: 20px; // Bo tròn hơn
-        padding: 8px 12px;
+        border-radius: 5px;
+        padding: 5px;
 
         input {
           border: none;
@@ -55,20 +39,11 @@
           background-color: transparent;
           color: themed("textColor");
 
-          // Làm cho placeholder đẹp hơn
-          &::placeholder {
-            color: themed("textColorSoft");
-          }
-          
-          &:focus {
-            outline: none; // Bỏ viền xanh khi focus
-          }
-
-          @include mobile {
+           @include mobile{
             display: none;
           }
 
-          @include tablet {
+          @include tablet{
             width: 200px;
           }
         }
@@ -80,37 +55,54 @@
       align-items: center;
       gap: 20px;
 
-      @include mobile {
+      @include mobile{
         display: none;
       }
       
-      // Style chung cho các icon bên phải
-      .MuiSvgIcon-root {
+      // --- PHẦN SỬA LỖI QUAN TRỌNG NHẤT ---
+      // Container cho icon chuông
+      .notification-icon-container {
+        position: relative; // Bắt buộc phải có để định vị cho "chấm đỏ"
         cursor: pointer;
-        transition: color 0.3s ease;
+        display: flex; // Giúp căn chỉnh icon
+        align-items: center;
       }
+      
+      // Style cho "chấm đỏ" (huy hiệu)
+      .notification-dot {
+        position: absolute;
+        top: -5px;      // Dịch lên trên
+        right: -8px;    // Dịch sang phải
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+        font-weight: bold;
+        
+        // Dùng flex để căn số vào giữa huy hiệu
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      // --- KẾT THÚC PHẦN SỬA LỖI ---
+
 
       .logout-icon {
+        cursor: pointer;
         &:hover {
           color: #f0544f;
         }
       }
-      
+
       .user {
         display: flex;
         align-items: center;
         gap: 10px;
         font-weight: 500;
-        
-        // Thêm hiệu ứng khi di chuột vào user
-        padding: 5px;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-        &:hover {
-          background-color: themed("bgSoft");
-        }
 
-        @include tablet {
+        @include tablet{
           display: none;
         }
 
@@ -122,6 +114,7 @@
         }
 
         span {
+        
         }
       }
     }
