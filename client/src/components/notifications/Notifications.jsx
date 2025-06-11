@@ -28,7 +28,7 @@ const Notifications = ({ notifications, isLoading, error }) => {
       case 'follow': return <p>{actorName} started following you.</p>;
       case 'post': return <p>{actorName} added a new post.</p>;
       case 'story': return <p>{actorName} added a new story.</p>;
-      default: return <p>{actorName} had a new activity.</p>;
+      default: return <p>{actorName} replied your comment</p>;
     }
   };
 

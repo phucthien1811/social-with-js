@@ -60,43 +60,51 @@ const RightBar = () => {
   return (
     <div className="rightBar">
       <div className="container">
-        {/* --- PHẦN GỢI Ý (Đầy đủ) --- */}
         <div className="item">
           <span>Suggestions For You</span>
-          {suggestionsError ? "Error!"
-           : suggestionsLoading ? "loading..."
-           : displayedSuggestions.map((user) => (
+          {suggestionsError ? (
+            <div className="no-data">Error loading suggestions</div>
+          ) : suggestionsLoading ? (
+            <div className="no-data">Loading...</div>
+          ) : displayedSuggestions.length === 0 ? (
+            <div className="no-data">No suggestions</div>
+          ) : (
+            displayedSuggestions.map((user) => (
               <SuggestedUser 
                 user={user} 
                 key={user.id} 
                 onAction={handleAction}
               />
-            ))}
+            ))
+          )}
         </div>
 
-        {/* --- PHẦN HOẠT ĐỘNG GẦN ĐÂY (Đầy đủ) --- */}
         <div className="item">
           <span>Latest Activities</span>
-          {activitiesError ? "Error!" 
-           : activitiesLoading ? "loading..." 
-           : allNotifications && allNotifications.slice(0, 5).map(activity => (
-            <div className="user" key={activity.id}>
-              <div className="userInfo">
-                <img
-                  src={activity.actorProfilePic ? "/upload/" + activity.actorProfilePic : "/path/to/default/avatar.png"}
-                  alt=""
-                />
-                {renderActivityText(activity)}
+          {activitiesError ? (
+            <div className="no-data">Error loading activities</div>
+          ) : activitiesLoading ? (
+            <div className="no-data">Loading...</div>
+          ) : allNotifications && allNotifications.length > 0 ? (
+            allNotifications.slice(0, 5).map(activity => (
+              <div className="user" key={activity.id}>
+                <div className="userInfo">
+                  <img
+                    src={activity.actorProfilePic ? "/upload/" + activity.actorProfilePic : "/upload/default.jpg"}
+                    alt=""
+                  />
+                  {renderActivityText(activity)}
+                </div>
+                <span>{moment(activity.createdAt).fromNow()}</span>
               </div>
-              <span>{moment(activity.createdAt).fromNow()}</span>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="no-data">No recent activities</div>
+          )}
         </div>
 
-        {/* --- PHẦN BẠN BÈ ONLINE (Giữ nguyên) --- */}
         <div className="item">
-          <span>Online Friends</span>
-          <div className="user">
+          <span>Online Friends</span>          <div className="user">
             <div className="userInfo">
               <img
                 src="https://images.pexels.com/photos/4881619/pexels-photo-4881619.jpeg?auto=compress&cs=tinysrgb&w=1600"

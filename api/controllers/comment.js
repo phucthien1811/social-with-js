@@ -72,3 +72,59 @@ export const deleteComment = (req, res) => {
     });
   });
 };
+
+export const getReplies = (req, res) => {
+  const q = `
+    SELECT r.*, u.id AS userId, u.name, u.profilePic 
+    FROM comment_replies r 
+    JOIN users u ON (u.id = r.user_id)
+    JOIN comments c ON (r.comment_id = c.id)
+    WHERE c.postId = ? 
+    ORDER BY r.created_at DESC
+  `;
+
+  db.query(q, [req.query.postId], (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.status(200).json(data);
+  });
+};
+
+export const addReply = (req, res) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!");
+
+  jwt.verify(token, "secretkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const q = "INSERT INTO comment_replies(comment_id, user_id, content, created_at) VALUES (?)";
+    const values = [
+      req.body.commentId,
+      userInfo.id,
+      req.body.content,
+      moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+    ];
+
+    db.query(q, [values], (err, data) => {
+      if (err) return res.status(500).json(err);
+
+      // Thêm thông báo cho người comment gốc
+      const notifyQuery = "SELECT userId FROM comments WHERE id = ?";
+      db.query(notifyQuery, [req.body.commentId], (err, commentData) => {
+        if (!err && commentData.length > 0 && commentData[0].userId !== userInfo.id) {
+          const notificationValues = [
+            'reply',
+            userInfo.id,
+            commentData[0].userId,
+            req.body.commentId,
+            moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+          ];
+          db.query("INSERT INTO notifications (`type`, `actorId`, `receiverId`, `entityId`, `createdAt`) VALUES (?)", 
+            [notificationValues]
+          );
+        }
+      });
+
+      return res.status(200).json("Reply added successfully");
+    });
+  });
+};
