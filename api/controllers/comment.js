@@ -30,6 +30,26 @@ export const addComment = (req, res) => {
 
     db.query(q, [values], (err, data) => {
       if (err) return res.status(500).json(err);
+
+    const postOwnerQuery = "SELECT userId FROM posts WHERE id = ?";
+      db.query(postOwnerQuery, [req.body.postId], (err, postData) => {
+        if (err || postData.length === 0) return; // Bỏ qua nếu có lỗi
+        const postOwnerId = postData[0].userId;
+
+        // Chỉ tạo thông báo nếu người bình luận không phải là chủ bài viết
+        if (postOwnerId !== userInfo.id) {
+          const notificationQuery = "INSERT INTO notifications (`type`, `actorId`, `receiverId`, `entityId`, `createdAt`) VALUES (?)";
+          const notificationValues = [
+            'comment',
+            userInfo.id,
+            postOwnerId,
+            req.body.postId,
+            moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
+          ];
+          db.query(notificationQuery, [notificationValues]);
+        }
+      });
+      
       return res.status(200).json("Comment has been created.");
     });
   });

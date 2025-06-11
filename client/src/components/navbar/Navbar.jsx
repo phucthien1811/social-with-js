@@ -27,18 +27,16 @@ const Navbar = ({ notifications }) => {
   // State để quản lý việc mở/đóng menu thông báo
   const [openNotifications, setOpenNotifications] = useState(false);
 
-  // Đếm số lượng thông báo chưa đọc từ props, không cần fetch lại
+  // Đếm số lượng thông báo chưa đọc từ props
   const unreadCount = notifications?.filter(n => n.isRead === 0).length || 0;
 
   // Mutation để gọi API đánh dấu đã đọc
-  const readMutation = useMutation(
-    () => { return makeRequest.put("/notifications/read"); },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["notifications"]);
-      },
-    }
-  );
+  const readMutation = useMutation({
+    mutationFn: () => makeRequest.put("/notifications/read"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
 
   const handleNotificationsClick = () => {
     // Khi mở menu, nếu có thông báo chưa đọc, thì gọi mutation
@@ -107,7 +105,7 @@ const Navbar = ({ notifications }) => {
       </div>
       
       {/* Truyền toàn bộ danh sách xuống cho component con */}
-      {openNotifications && <Notifications notifications={notifications} isLoading={false} error={null} />}
+      {openNotifications && <Notifications notifications={notifications} />}
     </div>
   );
 };

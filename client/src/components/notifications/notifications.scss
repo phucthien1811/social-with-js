@@ -32,6 +32,11 @@
         color: #5271ff;
         cursor: pointer;
         &:hover { text-decoration: underline; }
+        &.disabled {
+          cursor: not-allowed;
+          color: themed("textColorSoft");
+          text-decoration: none;
+        }
       }
     }
 
@@ -98,3 +103,4 @@
     }
   }
 }
+
