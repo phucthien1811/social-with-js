@@ -55,20 +55,28 @@ export const addComment = (req, res) => {
   });
 };
 
-export const deleteComment = (req, res) => {
-  const token = req.cookies.access_token;
-  if (!token) return res.status(401).json("Not authenticated!");
+export const deleteComment = (req, res) => {  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!");
 
-  jwt.verify(token, "jwtkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const commentId = req.params.id;
-    const q = "DELETE FROM comments WHERE `id` = ? AND `userId` = ?";
-
-    db.query(q, [commentId, userInfo.id], (err, data) => {
+  jwt.verify(token, "secretkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");    const commentId = req.params.id;
+    // Đầu tiên xóa tất cả replies của comment này
+    const deleteRepliesQuery = "DELETE FROM comment_replies WHERE comment_id = ?";
+    db.query(deleteRepliesQuery, [commentId], (err) => {
       if (err) return res.status(500).json(err);
-      if (data.affectedRows > 0) return res.json("Comment has been deleted!");
-      return res.status(403).json("You can delete only your comment!");
+
+      // Sau đó xóa comment
+      db.query("DELETE FROM comments WHERE `id` = ? AND `userId` = ?", [commentId, userInfo.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.affectedRows > 0) {
+          // Xóa tất cả thông báo liên quan đến comment này
+          const deleteNotificationsQuery = "DELETE FROM notifications WHERE (`type` = 'comment' OR `type` = 'reply') AND `entityId` = ?";
+          db.query(deleteNotificationsQuery, [commentId]);
+          
+          return res.json("Comment and its replies have been deleted!");
+        }
+        return res.status(403).json("You can delete only your comment!");
+      });
     });
   });
 };
@@ -105,26 +113,56 @@ export const addReply = (req, res) => {
     ];
 
     db.query(q, [values], (err, data) => {
-      if (err) return res.status(500).json(err);
-
-      // Thêm thông báo cho người comment gốc
-      const notifyQuery = "SELECT userId FROM comments WHERE id = ?";
+      if (err) return res.status(500).json(err);      // Thêm thông báo cho người comment gốc
+      const notifyQuery = "SELECT c.userId, c.id FROM comments c WHERE c.id = ?";
       db.query(notifyQuery, [req.body.commentId], (err, commentData) => {
         if (!err && commentData.length > 0 && commentData[0].userId !== userInfo.id) {
           const notificationValues = [
             'reply',
             userInfo.id,
             commentData[0].userId,
-            req.body.commentId,
+            commentData[0].id,
             moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
           ];
-          db.query("INSERT INTO notifications (`type`, `actorId`, `receiverId`, `entityId`, `createdAt`) VALUES (?)", 
-            [notificationValues]
-          );
+          const insertNotification = "INSERT INTO notifications (`type`, `actorId`, `receiverId`, `entityId`, `createdAt`) VALUES (?)";
+          db.query(insertNotification, [notificationValues], (err, result) => {
+            if (err) console.log("Error creating notification:", err);
+          });
         }
       });
 
       return res.status(200).json("Reply added successfully");
+    });
+  });
+};
+
+export const deleteReply = (req, res) => {
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Not logged in!");
+
+  jwt.verify(token, "secretkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const replyId = req.params.id;
+
+    // Trực tiếp xóa reply và kiểm tra quyền thông qua user_id
+    const deleteReplyQuery = "DELETE FROM comment_replies WHERE id = ? AND user_id = ?";
+    db.query(deleteReplyQuery, [replyId, userInfo.id], (err, data) => {
+      if (err) {
+        console.log("Error deleting reply:", err);
+        return res.status(500).json(err);
+      }
+      
+      if (data.affectedRows > 0) {
+        // Xóa thông báo liên quan đến reply này
+        const deleteNotificationQuery = "DELETE FROM notifications WHERE type = 'reply' AND entityId = ?";
+        db.query(deleteNotificationQuery, [replyId], (err) => {
+          if (err) console.log("Error deleting notification:", err);
+        });
+        
+        return res.json("Reply has been deleted!");
+      }
+      return res.status(403).json("You can delete only your reply!");
     });
   });
 };

@@ -29,13 +29,6 @@ const RightBar = () => {
   );
   
   // --- PHẦN LOGIC TỰ ĐỘNG CẬP NHẬT THỜI GIAN ---
-  const [currentTime, setCurrentTime] = useState(Date.now());
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 60000); // Cập nhật mỗi phút
-    return () => clearInterval(interval);
-  }, []);
 
   // --- HÀM RENDER NỘI DUNG THÔNG BÁO (ĐẦY ĐỦ) ---
   const renderActivityText = (activity) => {

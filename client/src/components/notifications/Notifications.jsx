@@ -18,17 +18,26 @@ const Notifications = ({ notifications, isLoading, error }) => {
   const handleMarkAsRead = () => {
     mutation.mutate();
   };
-
   // Hàm render nội dung thông báo
   const renderNotificationText = (notification) => {
     const actorName = <span className="actor-name">{notification.actorName}</span>;
+    
     switch (notification.type) {
-      case 'like': return <p>{actorName} liked your post.</p>;
-      case 'comment': return <p>{actorName} commented on your post.</p>;
-      case 'follow': return <p>{actorName} started following you.</p>;
-      case 'post': return <p>{actorName} added a new post.</p>;
-      case 'story': return <p>{actorName} added a new story.</p>;
-      default: return <p>{actorName} replied your comment</p>;
+      case 'like':
+        return <p>{actorName} liked your post.</p>;
+      case 'comment':
+        return <p>{actorName} commented on your post.</p>;
+      case 'follow':
+        return <p>{actorName} started following you.</p>;
+      case 'post':
+        return <p>{actorName} added a new post.</p>;
+      case 'story':
+        return <p>{actorName} added a new story.</p>;
+      case 'reply':
+        return <p>{actorName} replied to your comment.</p>;
+      default:
+        console.log("Unknown notification type:", notification.type);
+        return <p>{actorName} had a new activity.</p>;
     }
   };
 

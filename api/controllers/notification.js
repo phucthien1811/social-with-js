@@ -18,13 +18,12 @@ export const getNotifications = (req, res) => {
       CASE WHEN nr.id IS NOT NULL THEN 1 ELSE 0 END AS isRead
       FROM notifications AS n
       JOIN users AS u ON (n.actorId = u.id)
-      LEFT JOIN notification_reads AS nr ON (n.id = nr.notificationId AND nr.userId = ?)
-      WHERE
-        -- 1. Lấy thông báo cá nhân gửi ĐẾN TÔI (like, comment, follow)
+      LEFT JOIN notification_reads AS nr ON (n.id = nr.notificationId AND nr.userId = ?)      WHERE
+        -- 1. Lấy thông báo cá nhân gửi ĐẾN TÔI (like, comment, follow, reply)
         n.receiverId = ? 
         OR 
         -- 2. Lấy hoạt động (post/story) TỪ NHỮNG NGƯỜI TÔI FOLLOW
-        (n.actorId IN (SELECT followedUserId FROM relationships WHERE followerUserId = ?))
+        (n.type IN ('post', 'story') AND n.actorId IN (SELECT followedUserId FROM relationships WHERE followerUserId = ?))
       ORDER BY n.createdAt DESC
     `;
     
