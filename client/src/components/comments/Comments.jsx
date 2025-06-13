@@ -67,18 +67,54 @@ const Comments = ({ postId }) => {
         queryClient.invalidateQueries(["comments", postId]);
       },
     }
-  );
-
-  const deleteReplyMutation = useMutation(
-    (replyId) => {
-      return makeRequest.delete(`/comments/reply/${replyId}`);
+  );  const deleteReplyMutation = useMutation(
+    (params) => {
+      console.log("Deleting reply with params:", params);
+      return makeRequest.delete(`/comments/reply/${params.replyId}?commentId=${params.commentId}`);
     },
     {
       onSuccess: () => {
+        // Cập nhật cả replies và comments để đảm bảo UI được làm mới hoàn toàn
         queryClient.invalidateQueries(["replies", postId]);
+        queryClient.invalidateQueries(["comments", postId]);
       },
+      onError: (error) => {
+        console.error("Error deleting reply:", error);
+        alert("Có lỗi xảy ra khi xóa phản hồi. Vui lòng thử lại.");
+      }
     }
   );
+  const handleDelete = (id, type, parentCommentId = null) => {
+    const confirmMessage = type === 'reply' 
+      ? `Bạn có chắc muốn xóa phản hồi này?\nPhản hồi sẽ bị xóa vĩnh viễn.`
+      : "Bạn có chắc muốn xóa bình luận này?\nMọi phản hồi của bình luận này cũng sẽ bị xóa vĩnh viễn.";
+
+    if (window.confirm(confirmMessage)) {
+      try {
+        if (type === 'reply') {
+          if (!id || !parentCommentId) {
+            console.error("Missing required parameters for reply deletion:", { id, parentCommentId });
+            alert("Thiếu thông tin cần thiết để xóa phản hồi");
+            return;
+          }
+          deleteReplyMutation.mutate({ 
+            replyId: id, 
+            commentId: parentCommentId 
+          });
+        } else {
+          if (!id) {
+            console.error("Missing required parameter for comment deletion:", { id });
+            alert("Thiếu thông tin cần thiết để xóa bình luận");
+            return;
+          }
+          deleteCommentMutation.mutate(id);
+        }
+      } catch (error) {
+        console.error("Error in handleDelete:", error);
+        alert("Có lỗi xảy ra. Vui lòng thử lại.");
+      }
+    }
+  };
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -95,11 +131,6 @@ const Comments = ({ postId }) => {
     });
   };
 
-  const handleDeleteReply = (replyId) => {
-    if (window.confirm("Are you sure you want to delete this reply?")) {
-      deleteReplyMutation.mutate(replyId);
-    }
-  };
   const toggleReplies = (commentId) => {
     setExpandedComments((prev) => {
       const next = new Set(prev);
@@ -121,23 +152,6 @@ const Comments = ({ postId }) => {
   };
 
   // Add keyboard navigation handler
-  const handleMenuKeyDown = (e, commentId) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggleMenu(commentId, e);
-    }
-  };
-
-  const handleDropdownKeyDown = (e, action) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      action();
-    }
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      setMenuOpenMap({});
-    }
-  };
 
   return (
     <div className="comments">
@@ -192,16 +206,13 @@ const Comments = ({ postId }) => {
                         Reply
                       </button>
                       {currentUser.id === comment.userId && (
-                        <button
-                          className="delete"
+                        <button                          className="delete"
                           onClick={() => {
-                            if (window.confirm("Are you sure you want to delete this comment?")) {
-                              deleteCommentMutation.mutate(comment.id);
-                            }
+                            handleDelete(comment.id, 'comment');
                             setMenuOpenMap({});
                           }}
                         >
-                          Delete
+                          Xoá
                         </button>
                       )}
                     </div>
@@ -249,17 +260,14 @@ const Comments = ({ postId }) => {
                         </button>
                         {menuOpenMap[reply.id] && (
                           <div className="menu-dropdown">
-                            {currentUser.id === reply.userId && (
-                              <button
+                            {currentUser.id === reply.userId && (                              <button
                                 className="delete"
                                 onClick={() => {
-                                  if (window.confirm("Are you sure you want to delete this reply?")) {
-                                    deleteReplyMutation.mutate(reply.id);
-                                  }
+                                  handleDelete(reply.id, 'reply', comment.id);
                                   setMenuOpenMap({});
                                 }}
                               >
-                                Delete
+                                Xoá
                               </button>
                             )}
                           </div>

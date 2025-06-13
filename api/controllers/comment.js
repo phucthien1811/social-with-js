@@ -141,9 +141,14 @@ export const deleteReply = (req, res) => {
   if (!token) return res.status(401).json("Not logged in!");
 
   jwt.verify(token, "secretkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
-    const replyId = req.params.id;
+    if (err) return res.status(403).json("Token is not valid!");    const replyId = req.params.id;
+    const commentId = req.query.commentId;
+    
+    console.log("Deleting reply:", {
+      replyId,
+      commentId,
+      userId: userInfo.id
+    });
 
     // Trực tiếp xóa reply và kiểm tra quyền thông qua user_id
     const deleteReplyQuery = "DELETE FROM comment_replies WHERE id = ? AND user_id = ?";
@@ -152,12 +157,19 @@ export const deleteReply = (req, res) => {
         console.log("Error deleting reply:", err);
         return res.status(500).json(err);
       }
-      
-      if (data.affectedRows > 0) {
+        if (data.affectedRows > 0) {
         // Xóa thông báo liên quan đến reply này
-        const deleteNotificationQuery = "DELETE FROM notifications WHERE type = 'reply' AND entityId = ?";
-        db.query(deleteNotificationQuery, [replyId], (err) => {
-          if (err) console.log("Error deleting notification:", err);
+        const deleteNotificationQuery = "DELETE FROM notifications WHERE type = 'reply' AND entityId = ? AND actorId = ?";
+        db.query(deleteNotificationQuery, [commentId, userInfo.id], (err) => {
+          if (err) {
+            console.log("Error deleting notification:", err);
+          } else {
+            console.log("Successfully deleted notification for reply", {
+              commentId,
+              replyId,
+              userId: userInfo.id
+            });
+          }
         });
         
         return res.json("Reply has been deleted!");
