@@ -10,7 +10,7 @@
     background-color: themed("bg");
     color: themed("textColor");
 
-    @include mobile{
+    @include mobile {
       display: none;
     }
 
@@ -33,24 +33,38 @@
         flex-direction: column;
         gap: 20px;
 
-        span {
-          font-size: 12px;
+        > span {
+          font-size: 14px;
+          font-weight: 500;
+          color: themed("textColorSoft");
         }
 
         .user {
           display: flex;
           align-items: center;
           gap: 10px;
+          padding: 5px;
+          border-radius: 5px;
+          cursor: pointer;
+
+          &:hover {
+            background-color: themed("bgSoft");
+          }
 
           img {
             width: 30px;
             height: 30px;
             border-radius: 50%;
             object-fit: cover;
+            flex-shrink: 0;
           }
 
           span {
             font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
           }
         }
 
@@ -58,13 +72,26 @@
           display: flex;
           align-items: center;
           gap: 10px;
+          padding: 5px;
+          border-radius: 5px;
+          cursor: pointer;
+
+          &:hover {
+            background-color: themed("bgSoft");
+          }
 
           img {
             width: 30px;
+            height: 30px;
+            object-fit: contain;
+            flex-shrink: 0;
           }
 
           span {
             font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
       }
