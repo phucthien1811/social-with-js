@@ -67,43 +67,49 @@ const Comments = ({ postId }) => {
         queryClient.invalidateQueries(["comments", postId]);
       },
     }
-  );  const deleteReplyMutation = useMutation(
-    (params) => {
-      console.log("Deleting reply with params:", params);
-      return makeRequest.delete(`/comments/reply/${params.replyId}?commentId=${params.commentId}`);
+  );  const deleteReplyMutation = useMutation({
+    mutationFn: (replyId) => {
+      // Clean the ID - remove any ':' and convert to number
+      const cleanId = parseInt(replyId.toString().replace(':', ''));
+      console.log("Deleting reply with cleaned ID:", cleanId);
+      return makeRequest.delete(`/comments/reply/${cleanId}`);
     },
-    {
-      onSuccess: () => {
-        // Cập nhật cả replies và comments để đảm bảo UI được làm mới hoàn toàn
-        queryClient.invalidateQueries(["replies", postId]);
-        queryClient.invalidateQueries(["comments", postId]);
-      },
-      onError: (error) => {
-        console.error("Error deleting reply:", error);
-        alert("Có lỗi xảy ra khi xóa phản hồi. Vui lòng thử lại.");
-      }
+    onSuccess: () => {
+      console.log("Reply deleted successfully");
+      queryClient.invalidateQueries(["replies", postId]);
+      queryClient.invalidateQueries(["comments", postId]);
+    },
+    onError: (error) => {
+      console.error("Failed to delete reply:", error);
+      alert("Không thể xóa phản hồi. Vui lòng thử lại sau.");
     }
-  );
-  const handleDelete = (id, type, parentCommentId = null) => {
-    const confirmMessage = type === 'reply' 
+  });const handleDelete = (id, type, parentCommentId = null) => {
+    if (type === 'reply' && (!id || !parentCommentId)) {
+      console.error("Invalid parameters for reply deletion:", { id, parentCommentId });
+      alert("Thiếu thông tin cần thiết để xóa phản hồi");
+      return;
+    }
+
+    const confirmMessage = type === 'reply'
       ? `Bạn có chắc muốn xóa phản hồi này?\nPhản hồi sẽ bị xóa vĩnh viễn.`
       : "Bạn có chắc muốn xóa bình luận này?\nMọi phản hồi của bình luận này cũng sẽ bị xóa vĩnh viễn.";
 
     if (window.confirm(confirmMessage)) {
       try {
         if (type === 'reply') {
-          if (!id || !parentCommentId) {
-            console.error("Missing required parameters for reply deletion:", { id, parentCommentId });
-            alert("Thiếu thông tin cần thiết để xóa phản hồi");
-            return;
-          }
-          deleteReplyMutation.mutate({ 
-            replyId: id, 
-            commentId: parentCommentId 
+          console.log("Preparing to delete reply:", {
+            replyId: id,
+            commentId: parentCommentId,
+            type
+          });
+
+          deleteReplyMutation.mutate({
+            replyId: id,
+            commentId: parentCommentId
           });
         } else {
           if (!id) {
-            console.error("Missing required parameter for comment deletion:", { id });
+            console.error("Missing ID for comment deletion");
             alert("Thiếu thông tin cần thiết để xóa bình luận");
             return;
           }
@@ -259,11 +265,22 @@ const Comments = ({ postId }) => {
                           <MoreHorizIcon />
                         </button>
                         {menuOpenMap[reply.id] && (
-                          <div className="menu-dropdown">
-                            {currentUser.id === reply.userId && (                              <button
+                          <div className="menu-dropdown">                            {currentUser.id === reply.userId && (
+                              <button
                                 className="delete"
-                                onClick={() => {
-                                  handleDelete(reply.id, 'reply', comment.id);
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (window.confirm("Bạn có chắc muốn xóa phản hồi này không?")) {
+                                    // Ensure we're passing a clean number ID
+                                    const replyId = parseInt(reply.id.toString().replace(':', ''));
+                                    if (!isNaN(replyId)) {
+                                      console.log("Attempting to delete reply with cleaned ID:", replyId);
+                                      deleteReplyMutation.mutate(replyId);
+                                    } else {
+                                      console.error("Invalid reply ID:", reply.id);
+                                      alert("ID phản hồi không hợp lệ");
+                                    }
+                                  }
                                   setMenuOpenMap({});
                                 }}
                               >

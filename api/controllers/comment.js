@@ -141,40 +141,79 @@ export const deleteReply = (req, res) => {
   if (!token) return res.status(401).json("Not logged in!");
 
   jwt.verify(token, "secretkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");    const replyId = req.params.id;
-    const commentId = req.query.commentId;
+    if (err) return res.status(403).json("Token is not valid!");    // Clean and validate the ID from params
+    const replyId = parseInt(req.params.id.toString().replace(':', ''));
     
-    console.log("Deleting reply:", {
-      replyId,
-      commentId,
-      userId: userInfo.id
-    });
+    if (isNaN(replyId)) {
+      console.error("Invalid reply ID format:", req.params.id);
+      return res.status(400).json("Invalid reply ID format");
+    }
+    
+    console.log("Attempting to delete reply with cleaned ID:", replyId);
+    console.log("User attempting deletion:", userInfo.id);
 
-    // Trực tiếp xóa reply và kiểm tra quyền thông qua user_id
-    const deleteReplyQuery = "DELETE FROM comment_replies WHERE id = ? AND user_id = ?";
-    db.query(deleteReplyQuery, [replyId, userInfo.id], (err, data) => {
+    // Kiểm tra quyền sở hữu với JOIN để lấy thông tin user
+    const checkOwnershipQuery = `
+      SELECT cr.*, u.id as userId, u.name as userName
+      FROM comment_replies cr
+      JOIN users u ON cr.user_id = u.id
+      WHERE cr.id = ?
+    `;
+
+    db.query(checkOwnershipQuery, [replyId], (err, results) => {
       if (err) {
-        console.log("Error deleting reply:", err);
+        console.error("Database error when checking ownership:", err);
         return res.status(500).json(err);
       }
-        if (data.affectedRows > 0) {
-        // Xóa thông báo liên quan đến reply này
-        const deleteNotificationQuery = "DELETE FROM notifications WHERE type = 'reply' AND entityId = ? AND actorId = ?";
-        db.query(deleteNotificationQuery, [commentId, userInfo.id], (err) => {
-          if (err) {
-            console.log("Error deleting notification:", err);
-          } else {
-            console.log("Successfully deleted notification for reply", {
-              commentId,
-              replyId,
-              userId: userInfo.id
-            });
-          }
-        });
-        
-        return res.json("Reply has been deleted!");
+
+      console.log("Query results:", results);
+
+      if (results.length === 0) {
+        console.log("No reply found with ID:", replyId);
+        return res.status(404).json("Reply not found!");
       }
-      return res.status(403).json("You can delete only your reply!");
+
+      const reply = results[0];
+      console.log("Reply details:", {
+        replyId: reply.id,
+        userId: reply.user_id,
+        currentUser: userInfo.id,
+        isOwner: reply.user_id === userInfo.id
+      });
+
+      // Kiểm tra quyền sở hữu
+      if (parseInt(reply.user_id) !== parseInt(userInfo.id)) {
+        console.log("Permission denied - Users don't match:", {
+          replyUserId: reply.user_id,
+          currentUserId: userInfo.id
+        });
+        return res.status(403).json("You can only delete your own replies!");
+      }
+
+      // Người dùng có quyền, thực hiện xóa
+      const deleteReplyQuery = "DELETE FROM comment_replies WHERE id = ? AND user_id = ?";
+      db.query(deleteReplyQuery, [replyId, userInfo.id], (err, deleteResult) => {
+        if (err) {
+          console.error("Error during deletion:", err);
+          return res.status(500).json(err);
+        }
+
+        if (deleteResult.affectedRows > 0) {
+          // Xóa notifications liên quan
+          const deleteNotifQuery = "DELETE FROM notifications WHERE type = 'reply' AND actorId = ? AND entityId = ?";
+          db.query(deleteNotifQuery, [userInfo.id, reply.comment_id], (err) => {
+            if (err) {
+              console.error("Error deleting notifications:", err);
+            }
+          });
+
+          console.log("Successfully deleted reply:", replyId);
+          return res.status(200).json("Reply deleted successfully");
+        } else {
+          console.log("No reply was deleted");
+          return res.status(404).json("Reply not found or already deleted");
+        }
+      });
     });
   });
 };
