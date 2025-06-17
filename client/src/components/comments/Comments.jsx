@@ -147,14 +147,22 @@ const Comments = ({ postId }) => {
       }
       return next;
     });
-  };
-
-  const toggleMenu = (commentId, event) => {
+  };  const toggleMenu = (id, event, isReply = false) => {
+    event.preventDefault();
     event.stopPropagation();
-    setMenuOpenMap(prev => ({
-      ...prev,
-      [commentId]: !prev[commentId]
-    }));
+    
+    // Tạo một key duy nhất cho mỗi menu bằng cách thêm prefix
+    const menuKey = isReply ? `reply_${id}` : `comment_${id}`;
+    
+    setMenuOpenMap(prev => {
+      // Đóng tất cả các menu khác
+      const newState = {};
+      
+      // Chỉ toggle menu được click
+      newState[menuKey] = !prev[menuKey];
+      
+      return newState;
+    });
   };
 
   // Add keyboard navigation handler
@@ -195,16 +203,18 @@ const Comments = ({ postId }) => {
                     <span className="date">{moment(comment.createdAt).fromNow()}</span>
                   </div>
                 </div>
-                <div className="menu" ref={menuRef}>
-                  <button 
+                <div className="menu" ref={menuRef}>                  <button 
                     className="more-button" 
-                    onClick={(e) => toggleMenu(comment.id, e)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleMenu(comment.id, e, false);
+                    }}
                     aria-label="More options"
                   >
                     <MoreHorizIcon />
-                  </button>
-                  {menuOpenMap[comment.id] && (
-                    <div className="menu-dropdown">
+                  </button>                  {menuOpenMap[`comment_${comment.id}`] && (
+                    <div className="menu-dropdown" onClick={(e) => e.stopPropagation()}>
                       <button onClick={() => {
                         setReplyingTo(comment.id);
                         setMenuOpenMap({});
@@ -256,19 +266,22 @@ const Comments = ({ postId }) => {
                           <span className="date">{moment(reply.created_at).fromNow()}</span>
                         </div>
                       </div>
-                      <div className="menu">
-                        <button 
+                      <div className="menu">                        <button 
                           className="more-button" 
-                          onClick={(e) => toggleMenu(reply.id, e)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleMenu(reply.id, e, true);
+                          }}
                           aria-label="More options"
                         >
                           <MoreHorizIcon />
-                        </button>
-                        {menuOpenMap[reply.id] && (
-                          <div className="menu-dropdown">                            {currentUser.id === reply.userId && (
+                        </button>                        {menuOpenMap[`reply_${reply.id}`] && (
+                          <div className="menu-dropdown" onClick={(e) => e.stopPropagation()}>{currentUser.id === reply.userId && (
                               <button
                                 className="delete"
                                 onClick={(e) => {
+                                  e.preventDefault();
                                   e.stopPropagation();
                                   if (window.confirm("Bạn có chắc muốn xóa phản hồi này không?")) {
                                     // Ensure we're passing a clean number ID
