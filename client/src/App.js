@@ -1,5 +1,6 @@
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
+import Friends from "./pages/friends/Friends";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -59,10 +60,10 @@ function App() {
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
-      ),
-      children: [
+      ),      children: [
         { path: "/", element: <Home /> },
         { path: "/profile/:id", element: <Profile /> },
+        { path: "/friends", element: <Friends /> },
       ],
     },
     { path: "/login", element: <Login /> },

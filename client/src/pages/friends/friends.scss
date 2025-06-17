@@ -1,0 +1,172 @@
+@import "../../style.scss";
+
+.friends {
+  @include themify($themes) {
+    padding: 20px 70px;
+    background-color: themed("bgSoft");
+    min-height: calc(100vh - 70px);
+
+    .container {
+      display: flex;
+      gap: 20px;
+
+      .left {
+        flex: 1;
+        background-color: themed("bg");
+        padding: 20px;
+        border-radius: 10px;
+        height: max-content;
+        position: sticky;
+        top: 70px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+        h1 {
+          font-size: 24px;
+          margin-bottom: 20px;
+          color: themed("textColor");
+          font-weight: 700;
+        }
+
+        .menu {
+          .item {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background-color: themed("bgSoft");
+            }
+
+            &.active {
+              background-color: #e7f3ff;
+              color: #1877f2;
+              font-weight: 600;
+            }
+
+            span {
+              font-size: 15px;
+            }
+          }
+        }
+      }
+
+      .right {
+        flex: 3;
+        
+        .search {
+          margin-bottom: 20px;
+          
+          input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            background-color: themed("bg");
+            color: themed("textColor");
+            font-size: 15px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            
+            &:focus {
+              outline: none;
+              box-shadow: 0 0 0 2px #1877f2;
+            }
+
+            &::placeholder {
+              color: themed("textColorSoft");
+            }
+          }
+        }
+
+        .friendList {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 15px;
+
+          .friend {
+            background-color: themed("bg");
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            
+            &:hover {
+              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            }
+            
+            .info {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              margin-bottom: 15px;
+
+              img {
+                width: 80px;
+                height: 80px;
+                border-radius: 8px;
+                object-fit: cover;
+              }
+
+              .details {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                .name {
+                  font-weight: 600;
+                  font-size: 16px;
+                  color: themed("textColor");
+
+                  &:hover {
+                    text-decoration: underline;
+                    cursor: pointer;
+                  }
+                }
+
+                .mutualFriends {
+                  font-size: 14px;
+                  color: themed("textColorSoft");
+                }
+              }
+            }
+
+            .actions {
+              display: flex;
+              gap: 10px;
+
+              button {
+                flex: 1;
+                padding: 8px;
+                border: none;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 14px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &.message {
+                  background-color: #1877f2;
+                  color: white;
+
+                  &:hover {
+                    background-color: #1466d2;
+                  }
+                }
+
+                &.unfriend {
+                  background-color: themed("bgSoft");
+                  color: themed("textColor");
+
+                  &:hover {
+                    background-color: #f0f2f5;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
