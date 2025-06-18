@@ -134,9 +134,15 @@
           object-fit: cover;
         }
 
-        span {
-        
-        }
+       span{
+          color: themed("textColor");
+          font-size: 14px;
+          white-space: nowrap; // Ngăn text xuống dòng
+          overflow: hidden; // Ẩn phần thừa
+          text-overflow: ellipsis; // Hiển thị dấu "..."
+          max-width: 150px; // Giới hạn độ rộng tối đa
+          display: inline-block; // Để text có thể wrap trong khoảng không gian này
+       }
       }
     }
   }

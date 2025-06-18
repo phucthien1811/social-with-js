@@ -55,6 +55,15 @@
       .right {
         flex: 3;
         
+        .suggestions {
+          .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: themed("textColor");
+            margin-bottom: 20px;
+          }
+        }
+        
         .search {
           margin-bottom: 20px;
           
@@ -93,6 +102,21 @@
             
             &:hover {
               box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            }
+
+            &.suggestion {
+              border: 1px solid #e4e6eb;
+              
+              .actions {
+                .follow {
+                  background-color: #1877f2;
+                  color: white;
+                  
+                  &:hover {
+                    background-color: #1666d1;
+                  }
+                }
+              }
             }
             
             .info {
@@ -150,7 +174,7 @@
                   color: white;
 
                   &:hover {
-                    background-color: #1466d2;
+                    background-color: #1666d1;
                   }
                 }
 
