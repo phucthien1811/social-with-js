@@ -36,11 +36,12 @@ const LeftBar = () => {
               <span>Friends</span>
             </div>
           </Link>
-          {/* Các item khác giữ nguyên */}
-          <div className="item">
-            <img src={Groups} alt="" />
-            <span>Groups</span>
-          </div>
+          <Link to="/groups" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="item">
+              <img src={Groups} alt="" />
+              <span>Groups</span>
+            </div>
+          </Link>
           <div className="item">
             <img src={Market} alt="" />
             <span>Marketplace</span>

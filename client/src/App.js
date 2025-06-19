@@ -1,6 +1,7 @@
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import Friends from "./pages/friends/Friends";
+import Groups from "./pages/groups/Groups";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -64,6 +65,7 @@ function App() {
         { path: "/", element: <Home /> },
         { path: "/profile/:id", element: <Profile /> },
         { path: "/friends", element: <Friends /> },
+        { path: "/groups", element: <Groups /> },
       ],
     },
     { path: "/login", element: <Login /> },
