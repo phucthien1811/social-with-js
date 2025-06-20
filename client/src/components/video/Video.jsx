@@ -10,20 +10,12 @@ import MusicNoteIcon from '@mui/icons-material/MusicNote';
 
 const Video = ({ video }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  
-  // Dùng hook này để kiểm tra xem video có đang trong tầm nhìn không
   const { ref, inView } = useInView({ threshold: 0.5 });
 
-  // Tự động play/pause khi video vào/ra khỏi tầm nhìn
-  useEffect(() => {
-    setIsPlaying(inView);
-  }, [inView]);
+  useEffect(() => { setIsPlaying(inView); }, [inView]);
 
-  const handleVideoClick = () => {
-    setIsPlaying(!isPlaying);
-  };
+  const handleVideoClick = () => { setIsPlaying(!isPlaying); };
   
-  // Hàm để định dạng các con số lớn
   const formatCount = (count) => {
     if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M';
     if (count >= 1000) return (count / 1000).toFixed(1) + 'K';
@@ -32,44 +24,43 @@ const Video = ({ video }) => {
 
   return (
     <div className="video-item" ref={ref}>
-      <div className="video-player-container" onClick={handleVideoClick}>
-        <ReactPlayer
-          url={video.videoUrl}
-          playing={isPlaying}
-          loop={true}
-          width="100%"
-          height="100%"
-          muted={false}
-          playsinline={true}
-        />
-      </div>
-
-      <div className="video-overlay">
-        <div className="video-text-info">
+      <div className="video-main-content">
+        <div className="user-header">
           <Link to={`/profile/${video.userId}`} className="user-info">
             <img src={video.userImg} alt="" className="user-avatar" />
-            <span className="user-name">{video.userName}</span>
+            <div className="name-and-desc">
+                <span className="user-name">{video.userName}</span>
+                <p className="video-desc">{video.desc}</p>
+            </div>
           </Link>
-          <p className="video-desc">{video.desc}</p>
-          <div className="song-info">
+        </div>
+        <div className="video-wrapper" onClick={handleVideoClick}>
+          <ReactPlayer
+            url={video.videoUrl}
+            playing={isPlaying}
+            loop={true}
+            width="100%"
+            height="100%"
+            muted={false}
+          />
+        </div>
+         <div className="song-info">
             <MusicNoteIcon />
             <span>{video.song}</span>
           </div>
+      </div>
+      <div className="video-actions">
+        <div className="action-button">
+          <FavoriteIcon />
+          <span>{formatCount(video.likes)}</span>
         </div>
-
-        <div className="video-actions">
-          <div className="action-button">
-            <FavoriteIcon />
-            <span>{formatCount(video.likes)}</span>
-          </div>
-          <div className="action-button">
-            <CommentIcon />
-            <span>{formatCount(video.comments)}</span>
-          </div>
-          <div className="action-button">
-            <ShareIcon />
-            <span>{formatCount(video.shares)}</span>
-          </div>
+        <div className="action-button">
+          <CommentIcon />
+          <span>{formatCount(video.comments)}</span>
+        </div>
+        <div className="action-button">
+          <ShareIcon />
+          <span>{formatCount(video.shares)}</span>
         </div>
       </div>
     </div>
