@@ -2,11 +2,13 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import Friends from "./pages/friends/Friends";
 import Groups from "./pages/groups/Groups";
+import Watch from "./pages/watch/Watch";
 import {
   createBrowserRouter,
   RouterProvider,
   Outlet,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import LeftBar from "./components/leftBar/LeftBar";
@@ -17,15 +19,20 @@ import "./style.scss";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
-import { useQuery } from "@tanstack/react-query"; // Thêm import
-import { makeRequest } from "./axios"; // Thêm import
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "./axios";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
 
-  // --- LOGIC MỚI: GỌI API Ở COMPONENT CHA ---
+  // Layout giờ đây là component duy nhất và thông minh nhất
   const Layout = () => {
+    const location = useLocation();
+    
+    // Kiểm tra xem có phải đang ở trang Watch hay không
+    const isWatchPage = location.pathname === "/watch";
+
     // Gọi API để lấy tất cả thông báo ở đây, đúng một lần duy nhất
     const { isLoading, error, data: notifications } = useQuery(["notifications"], () =>
       makeRequest.get("/notifications").then((res) => res.data)
@@ -37,11 +44,16 @@ function App() {
         <Navbar notifications={notifications} />
         <div style={{ display: "flex" }}>
           <LeftBar />
+          {/* PHẦN SỬA LỖI QUAN TRỌNG NHẤT */}
+          {/* Phần nội dung chính sẽ luôn có flex: 6 */}
+          {/* Khi RightBar bị ẩn, nó sẽ tự động chiếm không gian còn lại */}
           <div style={{ flex: 6 }}>
             <Outlet />
           </div>
-          {/* Truyền dữ liệu notifications xuống cho RightBar */}
-          <RightBar notifications={notifications} isLoading={isLoading} error={error} />
+          {/* Chỉ hiển thị RightBar khi KHÔNG PHẢI là trang Watch */}
+          {!isWatchPage && (
+            <RightBar notifications={notifications} isLoading={isLoading} error={error} />
+          )}
         </div>
       </div>
     );
@@ -54,6 +66,7 @@ function App() {
     return children;
   };
 
+  // Bao gồm tất cả các route của bạn
   const router = createBrowserRouter([
     {
       path: "/",
@@ -61,11 +74,13 @@ function App() {
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
-      ),      children: [
+      ),
+      children: [
         { path: "/", element: <Home /> },
         { path: "/profile/:id", element: <Profile /> },
         { path: "/friends", element: <Friends /> },
         { path: "/groups", element: <Groups /> },
+        { path: "/watch", element: <Watch /> },
       ],
     },
     { path: "/login", element: <Login /> },

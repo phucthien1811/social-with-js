@@ -2,7 +2,8 @@
 
 .leftBar {
   @include themify($themes) {
-    flex: 2;
+    width: 250px;       // Đặt một chiều rộng cố định (bạn có thể điều chỉnh)
+    flex-shrink: 0;   // Ngăn nó bị co lại
     position: sticky;
     top: 70px;
     height: calc(100vh - 70px);

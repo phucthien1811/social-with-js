@@ -46,10 +46,12 @@ const LeftBar = () => {
             <img src={Market} alt="" />
             <span>Marketplace</span>
           </div>
-          <div className="item">
-            <img src={Watch} alt="" />
-            <span>Watch</span>
-          </div>
+          <Link to="/watch" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="item">
+              <img src={Watch} alt="" />
+              <span>Watch</span>
+            </div>
+          </Link>
           <div className="item">
             <img src={Memories} alt="" />
             <span>Memories</span>
@@ -71,10 +73,12 @@ const LeftBar = () => {
             <img src={Gallery} alt="" />
             <span>Gallery</span>
           </div>
-          <div className="item">
-            <img src={Videos} alt="" />
-            <span>Videos</span>
-          </div>
+          <Link to="/videos" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="item">
+              <img src={Videos} alt="" />
+              <span>Videos</span>
+            </div>
+          </Link>
           <div className="item">
             <img src={Messages} alt="" />
             <span>Messages</span>
