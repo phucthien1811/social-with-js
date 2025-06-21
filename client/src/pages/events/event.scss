@@ -1,0 +1,136 @@
+// event.scss
+
+// Import file style chính (chứa map theme và hàm themed)
+@import "../../style.scss"; 
+
+// --- COMPONENT STYLES ---
+// (Lý tưởng nhất là tách mỗi khối này ra file riêng: _button.scss, _card.scss)
+
+.custom-button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  align-self: flex-start; // Giúp nút không bị kéo dài ra
+
+  // Biến thể mặc định (màu chính)
+  &--primary {
+    // background: themed("primary");
+    // color: themed("primary-text");
+
+    &:hover {
+      opacity: 0.9; 
+    }
+  }
+
+  // Biến thể đã tham gia
+  &--joined {
+    // background: themed("button-secondary-bg");
+    // color: themed("button-secondary-text");
+    cursor: default;
+  }
+}
+
+.event-card {
+//   background: themed("bg");
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  &__image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+
+  &__info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; 
+  }
+
+  &__title {
+    margin: 0 0 10px 0;
+    // color: themed("textColor");
+    font-size: 1.1rem;
+  }
+
+  &__date {
+    font-size: 0.9rem;
+    // color: themed("textColorSoft");
+    margin-bottom: auto; 
+    padding-bottom: 15px; 
+  }
+}
+
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+// --- PAGE-SPECIFIC LAYOUT ---
+
+.event-page {
+  display: flex;
+  min-height: 100svh; // Dùng svh để tối ưu hiển thị trên mobile
+//   background: themed("bgSoft");
+
+  // Sidebar của trang Event
+  &__sidebar {
+    flex-shrink: 0; // Không cho sidebar bị co lại
+    width: 250px;
+    // background: themed("bg");
+    padding: 30px 20px;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+  }
+
+  &__sidebar-title {
+    margin-bottom: 30px;
+    // color: themed("textColor");
+  }
+
+  &__menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__menu-item {
+    padding: 12px 15px;
+    // color: themed("textColorSoft");
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &.active, 
+    &:hover {
+    //   background: themed("primary");
+    //   color: themed("primary-text");
+    }
+  }
+
+  // Main content của trang Event
+  &__main {
+    flex-grow: 1; // Cho phép co giãn
+    padding: 40px 60px;
+    overflow-y: auto; // Thêm thanh cuộn nếu nội dung quá dài
+  }
+
+  &__main-title {
+    // color: themed("textColor");
+    margin-bottom: 30px;
+  }
+}

@@ -63,20 +63,24 @@ const LeftBar = () => {
         <div className="menu">
           <span>Your shortcuts</span>
           {/* Các item khác giữ nguyên */}
-          <div className="item">
-            <img src={Events} alt="" />
-            <span>Events</span>
-          </div>
+          <Link to="/events" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="item">
+              <img src={Events} alt="" />
+              <span>Events</span>
+            </div>
+          </Link>
           <Link to="/gaming" style={{ textDecoration: "none", color: "inherit" }}>
             <div className="item">
               <img src={Gaming} alt="" />
               <span>Gaming</span>
             </div>
           </Link>
-          <div className="item">
-            <img src={Gallery} alt="" />
-            <span>Gallery</span>
-          </div>
+          <Link to="/gallery" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="item">
+              <img src={Gallery} alt="" />
+              <span>Gallery</span>
+            </div>
+          </Link>
           <Link to="/messages" style={{ textDecoration: "none", color: "inherit" }}>
             <div className="item">
               <img src={Messages} alt="" />

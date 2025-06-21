@@ -5,6 +5,8 @@ import Groups from "./pages/groups/Groups";
 import Watch from "./pages/watch/Watch";
 import Memories from "./pages/memories/Memories";
 import Gaming from "./pages/gaming/Gaming";
+import Events from "./pages/events/Events";
+import Gallery from "./pages/gallery/Gallery";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -85,6 +87,8 @@ function App() {
         { path: "/watch", element: <Watch /> },
         { path: "/memories", element: <Memories /> },
         { path: "/gaming", element: <Gaming /> },
+        { path: "/events", element: <Events /> },
+        { path: "/gallery", element: <Gallery /> },
       ],
     },
     { path: "/login", element: <Login /> },
