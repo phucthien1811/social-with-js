@@ -7,6 +7,7 @@ import Memories from "./pages/memories/Memories";
 import Gaming from "./pages/gaming/Gaming";
 import Events from "./pages/events/Events";
 import Gallery from "./pages/gallery/Gallery";
+import Messages from "./pages/messages/Messages";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -89,6 +90,7 @@ function App() {
         { path: "/gaming", element: <Gaming /> },
         { path: "/events", element: <Events /> },
         { path: "/gallery", element: <Gallery /> },
+        { path: "/messages", element: <Messages /> }, // Giả sử bạn có một trang sự kiện chi tiết
       ],
     },
     { path: "/login", element: <Login /> },
