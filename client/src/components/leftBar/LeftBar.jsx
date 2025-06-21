@@ -52,10 +52,12 @@ const LeftBar = () => {
               <span>Watch</span>
             </div>
           </Link>
-          <div className="item">
-            <img src={Memories} alt="" />
-            <span>Memories</span>
-          </div>
+          <Link to="/memories" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="item">
+              <img src={Memories} alt="" />
+              <span>Memories</span>
+            </div>
+          </Link>
         </div>
         <hr />
         <div className="menu">

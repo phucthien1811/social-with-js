@@ -3,6 +3,7 @@ import Register from "./pages/register/Register";
 import Friends from "./pages/friends/Friends";
 import Groups from "./pages/groups/Groups";
 import Watch from "./pages/watch/Watch";
+import Memories from "./pages/memories/Memories";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -81,6 +82,7 @@ function App() {
         { path: "/friends", element: <Friends /> },
         { path: "/groups", element: <Groups /> },
         { path: "/watch", element: <Watch /> },
+        { path: "/memories", element: <Memories /> },
       ],
     },
     { path: "/login", element: <Login /> },

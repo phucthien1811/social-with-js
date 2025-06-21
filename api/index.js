@@ -13,6 +13,7 @@ import relationshipRoutes from "./routes/relationships.js";
 import storyRoutes from "./routes/stories.js"
 import notificationRoutes from "./routes/notifications.js";
 import friendRoutes from "./routes/friends.js";
+import memoryRoutes from "./routes/memories.js";
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use("/api/relationships", relationshipRoutes);
 app.use("/api/stories", storyRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/friends", friendRoutes);
+app.use("/api/memories", memoryRoutes);
 
 app.listen(8800, () => {
   console.log("API server is running!");
