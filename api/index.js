@@ -61,6 +61,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/friends", friendRoutes);
 app.use("/api/memories", memoryRoutes);
 
+
 app.listen(8800, () => {
   console.log("API server is running!");
 });

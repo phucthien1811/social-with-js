@@ -83,6 +83,7 @@ function App() {
         { path: "/groups", element: <Groups /> },
         { path: "/watch", element: <Watch /> },
         { path: "/memories", element: <Memories /> },
+       
       ],
     },
     { path: "/login", element: <Login /> },
