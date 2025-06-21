@@ -67,10 +67,12 @@ const LeftBar = () => {
             <img src={Events} alt="" />
             <span>Events</span>
           </div>
-          <div className="item">
-            <img src={Gaming} alt="" />
-            <span>Gaming</span>
-          </div>
+          <Link to="/gaming" style={{ textDecoration: "none", color: "inherit" }}>
+            <div className="item">
+              <img src={Gaming} alt="" />
+              <span>Gaming</span>
+            </div>
+          </Link>
           <div className="item">
             <img src={Gallery} alt="" />
             <span>Gallery</span>

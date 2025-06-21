@@ -4,6 +4,7 @@ import Friends from "./pages/friends/Friends";
 import Groups from "./pages/groups/Groups";
 import Watch from "./pages/watch/Watch";
 import Memories from "./pages/memories/Memories";
+import Gaming from "./pages/gaming/Gaming";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -83,7 +84,7 @@ function App() {
         { path: "/groups", element: <Groups /> },
         { path: "/watch", element: <Watch /> },
         { path: "/memories", element: <Memories /> },
-       
+        { path: "/gaming", element: <Gaming /> },
       ],
     },
     { path: "/login", element: <Login /> },
