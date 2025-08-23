@@ -5,7 +5,6 @@ import moment from "moment";
 export const getMemories = (req, res) => {
   const userId = req.user.id;
   const today = moment();
-  
   const query = `
     SELECT p.*, u.id AS userId, name, profilePic,
     (SELECT COUNT(*) FROM likes WHERE postId = p.id) AS likes,
@@ -17,7 +16,7 @@ export const getMemories = (req, res) => {
       DAY(createdAt) = ? 
       AND MONTH(createdAt) = ?
       AND YEAR(createdAt) < ?
-    )
+    )~
     ORDER BY createdAt DESC
   `;
 
