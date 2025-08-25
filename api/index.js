@@ -2,6 +2,12 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import dotenv from "dotenv";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
 // Import các routes của bạn
 import authRoutes from "./routes/auth.js";
@@ -15,37 +21,56 @@ import notificationRoutes from "./routes/notifications.js";
 import friendRoutes from "./routes/friends.js";
 import memoryRoutes from "./routes/memories.js";
 
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
 // --- MIDDLEWARES (Cấu hình theo đúng thứ tự này) ---
 
-// 1. Cho phép backend xử lý JSON và đọc cookie từ request
+// security + parsing
+app.use(helmet());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// 2. Cấu hình CORS để "tin tưởng" frontend và cho phép nhận cookie
+// cors (allow frontend with credentials)
+const FRONTEND_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
 app.use(
   cors({
-    origin: "http://localhost:3000", // Chỉ cho phép địa chỉ này
-    credentials: true, // Cho phép trình duyệt gửi cookie đính kèm request
+    origin: FRONTEND_ORIGIN,
+    credentials: true,
   })
 );
 
+// basic rate limiting
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
+app.use(limiter);
+
 // --- Cấu hình Multer để upload file ---
+const uploadDir = path.join(__dirname, "..", "client", "public", "upload");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "../client/public/upload");
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + file.originalname);
+    const safeName = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+    cb(null, safeName);
   },
 });
 
 const upload = multer({ storage: storage });
 
+// serve upload files statically
+app.use("/upload", express.static(uploadDir));
+
 app.post("/api/upload", upload.single("file"), (req, res) => {
   const file = req.file;
-  res.status(200).json(file.filename);
+  res.status(200).json(file ? file.filename : null);
 });
 
 
@@ -62,6 +87,7 @@ app.use("/api/friends", friendRoutes);
 app.use("/api/memories", memoryRoutes);
 
 
-app.listen(8800, () => {
-  console.log("API server is running!");
+const PORT = process.env.PORT || 8800;
+app.listen(PORT, () => {
+  console.log(`API server is running on port ${PORT}`);
 });
