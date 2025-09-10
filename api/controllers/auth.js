@@ -12,7 +12,7 @@ export const login = (req, res) => {
     const checkPassword = bcrypt.compareSync(req.body.password, data[0].password);
     if (!checkPassword) return res.status(400).json("Wrong password or username!");
 
-    const token = jwt.sign({ id: data[0].id }, "secretkey");
+    const token = jwt.sign({ id: data[0].id }, process.env.JWT_SECRET || "secretkey");
     const { password, ...others } = data[0];
 
     // Gửi cookie đi với cấu hình chuẩn

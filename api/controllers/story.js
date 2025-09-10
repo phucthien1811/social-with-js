@@ -3,12 +3,6 @@ import jwt from "jsonwebtoken";
 import moment from "moment";
 
 export const getStories = (req, res) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("Not logged in!");
-
-  jwt.verify(token, "secretkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
     // =======================================================
     // LOGIC HOÀN CHỈNH - LẤY STORY CỦA BẠN VÀ BẠN BÈ
     // =======================================================
@@ -33,16 +27,10 @@ export const getStories = (req, res) => {
       }
       return res.status(200).json(data);
     });
-  });
 };
 
 // Các hàm addStory và deleteStory 
 export const addStory = (req, res) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("Not logged in!");
-
-  jwt.verify(token, "secretkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
 
     const q = "INSERT INTO stories(`img`, `createdAt`, `userId`) VALUES (?)";
     const values = [
@@ -70,16 +58,10 @@ export const addStory = (req, res) => {
 
       return res.status(200).json("Story has been created.");
     });
-  });
+  
 };
 
 export const deleteStory = (req, res) => {
-  const token = req.cookies.accessToken;
-  if (!token) return res.status(401).json("Not logged in!");
-
-  jwt.verify(token, "secretkey", (err, userInfo) => {
-    if (err) return res.status(403).json("Token is not valid!");
-
     // --- LOGIC MỚI ---
     const deleteStoryQuery = "DELETE FROM stories WHERE `id`=? AND `userId` = ?";
     db.query(deleteStoryQuery, [req.params.id, userInfo.id], (err, data) => {
@@ -93,5 +75,5 @@ export const deleteStory = (req, res) => {
       }
       return res.status(403).json("You can delete only your story!");
     });
-  });
+
 };

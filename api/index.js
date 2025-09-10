@@ -20,6 +20,7 @@ import storyRoutes from "./routes/stories.js"
 import notificationRoutes from "./routes/notifications.js";
 import friendRoutes from "./routes/friends.js";
 import memoryRoutes from "./routes/memories.js";
+import groupsRoutes from "./routes/groups.js";
 
 dotenv.config();
 
@@ -85,6 +86,7 @@ app.use("/api/stories", storyRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/friends", friendRoutes);
 app.use("/api/memories", memoryRoutes);
+app.use("/api/groups", groupsRoutes);
 
 
 const PORT = process.env.PORT || 8800;
