@@ -1,0 +1,53 @@
+@import "../../style.scss";
+
+.watch-page {
+  @include themify($themes) {
+    width: 100%;
+    height: calc(100vh - 50px);
+    display: flex;
+    justify-content: center;
+    position: relative;
+    padding-top: 20px;
+    background-color: themed("bg");
+    
+    .videos-container {
+      width: 100%;
+      // --- SỬA LẠI CHIỀU RỘNG TỐI ĐA ---
+      // Giảm chiều rộng để có cảm giác giống điện thoại hơn
+      max-width: 420px; 
+      height: 100%;
+      border-radius: 8px;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      &::-webkit-scrollbar { display: none; }
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .scroll-navigation {
+      position: absolute;
+      // Đặt nút bấm ra ngoài cột video một chút
+      right: calc(50% - 210px - 70px);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 10;
+
+      .scroll-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &:hover { background-color: rgba(255, 255, 255, 0.3); }
+      }
+    }
+  }
+}

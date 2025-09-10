@@ -1,0 +1,240 @@
+@import "../../style.scss";
+
+.groups {
+  @include themify($themes) {
+    padding: 20px;
+    background-color: themed("bgSoft");
+    min-height: 100vh;
+
+    .container {
+      display: flex;
+      gap: 20px;
+
+      .left {
+        flex: 1;
+        position: sticky;
+        top: 70px;
+        height: calc(100vh - 70px);
+        overflow: auto;
+        background-color: themed("bg");
+        padding: 20px;
+        border-radius: 10px;
+        -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+        -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+        box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+
+        &::-webkit-scrollbar {
+          width: 5px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background-color: themed("bgSoft");
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-color: themed("textColorSoft");
+          border-radius: 5px;
+        }
+
+        .search {
+          width: 100%;
+          margin-bottom: 20px;
+          
+          input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: themed("bgSoft");
+            color: themed("textColor");
+            font-size: 16px;
+
+            &:focus {
+              outline: none;
+              background-color: themed("bg");
+              box-shadow: 0 0 0 2px themed("border");
+            }
+          }
+        }
+
+        .menu {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          margin-bottom: 30px;
+
+          .title {
+            font-size: 20px;
+            font-weight: 500;
+            color: themed("textColor");
+            margin-bottom: 10px;
+          }
+
+          .item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: themed("textColor");
+
+            &:hover {
+              background-color: themed("bgSoft");
+            }
+
+            &.active {
+              background-color: themed("bgSoft");
+              font-weight: 500;
+            }
+
+            span {
+              font-size: 16px;
+            }
+          }
+
+          .createGroup {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover {
+              background-color: #1666d1;
+            }
+          }
+        }
+
+        .joinedGroups {
+          .title {
+            font-size: 17px;
+            font-weight: 500;
+            color: themed("textColor");
+            margin-bottom: 15px;
+          }
+
+          .group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+
+            &:hover {
+              background-color: themed("bgSoft");
+            }
+
+            img {
+              width: 40px;
+              height: 40px;
+              border-radius: 8px;
+              object-fit: cover;
+            }
+
+            .details {
+              display: flex;
+              flex-direction: column;
+
+              .name {
+                font-weight: 500;
+                color: themed("textColor");
+              }
+
+              .members {
+                font-size: 14px;
+                color: themed("textColorSoft");
+              }
+            }
+          }
+        }
+      }
+
+      .right {
+        flex: 3;
+        
+        h2 {
+          color: themed("textColor");
+          margin-bottom: 20px;
+        }
+
+        .groupGrid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 20px;
+
+          .groupCard {
+            background-color: themed("bg");
+            border-radius: 10px;
+            overflow: hidden;
+            -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+            -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+            box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.09);
+
+            img {
+              width: 100%;
+              height: 200px;
+              object-fit: cover;
+            }
+
+            .info {
+              padding: 20px;
+
+              h3 {
+                color: themed("textColor");
+                margin-bottom: 10px;
+              }
+
+              p {
+                color: themed("textColorSoft");
+                margin-bottom: 10px;
+                font-size: 14px;
+              }
+
+              .members {
+                display: block;
+                color: themed("textColorSoft");
+                font-size: 14px;
+                margin-bottom: 15px;
+              }
+
+              .admin {
+                display: inline-block;
+                padding: 5px 10px;
+                background-color: themed("bgSoft");
+                color: themed("textColor");
+                border-radius: 20px;
+                font-size: 12px;
+                margin-top: 10px;
+              }
+
+              .join {
+                width: 100%;
+                padding: 10px;
+                background-color: #1877f2;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-size: 16px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+
+                &:hover {
+                  background-color: #1666d1;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,143 @@
+@import "../../style.scss";
+
+.user {
+  @include themify($themes) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: themed("bgSoft");
+    }
+
+    .userInfo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      img {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      span {
+        font-size: 14px;
+        color: themed("textColor");
+        font-weight: 500;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+
+      button {
+        padding: 6px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:first-child {
+          background-color: #5271ff;
+          color: white;
+
+          &:hover {
+            background-color: #4060ff;
+          }
+        }
+
+        &:last-child {
+          background-color: themed("bgSoft");
+          color: themed("textColor");
+
+          &:hover {
+            background-color: #f0544f;
+            color: white;
+          }
+        }
+      }
+    }
+
+    @include mobile {
+      display: none;
+    }
+
+    // Ẩn thanh cuộn mặc định cho đẹp
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .container {
+      // --- PHẦN SỬA LỖI QUAN TRỌNG NHẤT ---
+      // Xóa padding ngang, chỉ giữ padding dọc để tạo khoảng cách trên dưới
+      padding: 20px 0;
+    }
+
+    hr {
+      margin: 15px 20px; // Thêm padding cho hr để nó không bị sát lề
+      border: none;
+      height: 0.5px;
+      background-color: themed("border");
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px; // Giảm khoảng cách giữa các mục menu
+
+      // Style cho các tiêu đề nhỏ như "Your shortcuts"
+      & > span {
+        padding: 0 20px; // Thêm padding cho riêng các tiêu đề này
+        font-size: 12px;
+        font-weight: 500;
+        color: themed("textColorSoft");
+      }
+
+      // Style chung cho một mục trong menu
+      .user, .item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        
+        // Thêm padding cho từng mục thay vì cho cả container
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.2s ease-in-out;
+
+        &:hover {
+          background-color: themed("bgSoft");
+        }
+
+        img {
+          width: 30px;
+          height: 30px;
+          object-fit: cover;
+        }
+
+        // Style riêng cho ảnh đại diện user để nó luôn tròn
+        &.user img {
+          border-radius: 50%;
+        }
+
+        span {
+          font-size: 14px;
+          color: themed("textColor");
+        }
+      }
+    }
+  }
+}

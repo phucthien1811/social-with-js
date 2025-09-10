@@ -1,0 +1,84 @@
+@import "../../style.scss"; // DÒNG QUAN TRỌNG NHẤT ĐÃ ĐƯỢC THÊM LẠI
+
+.video-item {
+  @include themify($themes) {
+    width: 100%;
+    height: calc(100vh - 50px - 40px); // Chiều cao 1 video (trừ navbar và padding)
+    max-height: 800px;
+    display: flex; // Sử dụng Flexbox để chia cột
+    align-items: flex-end; // Căn mọi thứ xuống dưới
+    gap: 16px;
+    position: relative;
+    padding-bottom: 20px;
+    scroll-snap-align: start; 
+
+    .video-main-content {
+      flex: 1; // Phần video và text chiếm hết không gian còn lại
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      .user-header {
+        .user-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          color: themed("textColor");
+          text-decoration: none;
+          
+          .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+          }
+          .name-and-desc {
+            .user-name { font-weight: bold; font-size: 16px; }
+            .video-desc { font-size: 14px; margin: 4px 0; }
+          }
+        }
+      }
+      
+      .video-wrapper {
+        flex-grow: 1; // Cho phép video co giãn để lấp đầy không gian
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 10px;
+        cursor: pointer;
+        background-color: black;
+        
+        video {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: contain; // Dùng contain để không bị cắt xén
+        }
+      }
+
+      .song-info {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+        margin-top: 10px;
+        .MuiSvgIcon-root { font-size: 18px; }
+      }
+    }
+
+    .video-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+
+      .action-button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        color: themed("textColor");
+
+        .MuiSvgIcon-root { font-size: 35px; }
+        span { font-size: 12px; font-weight: bold; }
+      }
+    }
+  }
+}

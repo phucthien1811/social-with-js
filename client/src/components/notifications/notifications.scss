@@ -1,0 +1,106 @@
+@import "../../style.scss";
+
+.notifications-dropdown {
+  @include themify($themes) {
+    position: absolute;
+    top: 55px;
+    right: 0;
+    width: 350px;
+    max-height: 400px;
+    background-color: themed("bg");
+    color: themed("textColor");
+    border: 1px solid themed("border");
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      border-bottom: 1px solid themed("border");
+
+      h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+      .mark-as-read {
+        font-size: 12px;
+        color: #5271ff;
+        cursor: pointer;
+        &:hover { text-decoration: underline; }
+        &.disabled {
+          cursor: not-allowed;
+          color: themed("textColorSoft");
+          text-decoration: none;
+        }
+      }
+    }
+
+    .notification-list {
+      overflow-y: auto;
+      padding: 5px;
+    }
+
+    .notification-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 5px;
+      position: relative;
+      gap: 10px;
+
+      &:hover {
+        background-color: themed("bgSoft");
+      }
+
+      // Style cho thông báo chưa đọc
+      &[data-read="0"] {
+        background-color: themed("bgSoft");
+      }
+
+      img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .notification-content {
+        flex: 1;
+        p {
+          margin: 0;
+          font-size: 14px;
+          line-height: 1.4;
+
+          .actor-name {
+            font-weight: bold;
+          }
+        }
+        .timestamp {
+          font-size: 12px;
+          color: #5271ff;
+        }
+      }
+
+      .unread-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #5271ff;
+        border-radius: 50%;
+      }
+    }
+    
+    .no-notifications {
+        padding: 20px;
+        text-align: center;
+        color: themed("textColorSoft");
+    }
+  }
+}
+

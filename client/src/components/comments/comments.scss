@@ -1,0 +1,360 @@
+@import "../../style.scss";
+
+.comments {
+  @include themify($themes) {
+    img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .write {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+      padding: 8px;
+
+      input {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 20px;
+        background-color: themed("bgSoft");
+        color: themed("textColor");
+        font-size: 13px;
+
+        &:focus {
+          outline: none;
+          background-color: themed("bg");
+        }
+
+        &::placeholder {
+          color: themed("textColorSoft");
+        }
+      }
+
+      button {
+        border: none;
+        background: none;
+        color: #5271ff;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 0 12px;
+        cursor: pointer;
+        opacity: 0.9;
+        
+        &:hover {
+          opacity: 1;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .loading,
+    .error-message,
+    .no-comments {
+      text-align: center;
+      padding: 20px;
+      color: themed("textColorSoft");
+      font-size: 14px;
+    }
+
+    .error-message {
+      color: #ff4747;
+    }
+
+    .comment-container {
+      margin: 12px 0;
+      width: fit-content;
+      max-width: 100%;
+
+      .comment {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+
+        img {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+
+        .info {
+          background-color: themed("bgSoft");
+          padding: 8px 12px;
+          border-radius: 18px;
+          position: relative;
+          width: fit-content;
+          max-width: calc(100% - 80px);
+
+          span.username {
+            font-size: 12px;
+            color: themed("textColorSoft");
+            margin-right: 4px;
+            display: inline-block;
+            opacity: 0.9;
+            
+            &:hover {
+              text-decoration: underline;
+              cursor: pointer;
+            }
+          }
+
+          p {
+            color: themed("textColor");
+            font-size: 13.5px;
+            line-height: 1.4;
+            margin: 0;
+            font-weight: 500;
+            word-wrap: break-word;
+            display: inline;
+          }
+
+          .actions {
+            margin-top: 2px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+
+            .date {
+              color: themed("textColorSoft");
+              font-size: 11px;
+              opacity: 0.7;
+            }
+          }
+        }        .menu {
+          position: relative;
+
+          .more-button {
+            background: none;
+            border: none;
+            color: themed("textColorSoft");
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s;
+            z-index: 1;
+
+            &:hover {
+              background-color: themed("bgSoft");
+              color: themed("textColor");
+            }
+          }
+
+          .menu-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: themed("bg");
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 13;
+            min-width: 120px;
+            padding: 4px 0;
+            transform-origin: top right;
+            animation: menuFadeIn 0.2s ease;
+
+            @keyframes menuFadeIn {
+              from {
+                opacity: 0;
+                transform: scale(0.95);
+              }
+              to {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
+
+            button {
+              width: 100%;
+              padding: 8px 16px;
+              text-align: left;
+              background: none;
+              border: none;
+              color: themed("textColor");
+              font-size: 13px;
+              cursor: pointer;
+              display: block;
+
+              &:hover {
+                background-color: themed("bgSoft");
+              }
+
+              &.delete {
+                color: #ff4747;
+              }
+
+              &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                background: none !important;
+              }
+            }
+          }
+        }
+
+        &:hover {
+          .more-button {
+            opacity: 1;
+          }
+        }
+      }
+
+      .reply-input {
+        margin: 10px 0 10px 42px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        animation: replySlideDown 0.3s ease;
+
+        @keyframes replySlideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        input {
+          flex: 1;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 20px;
+          background-color: themed("bgSoft");
+          color: themed("textColor");
+          font-size: 13px;
+
+          &:focus {
+            outline: none;
+            background-color: themed("bg");
+          }
+        }
+
+        button {
+          border: none;
+          background: #5271ff;
+          color: white;
+          padding: 6px 16px;
+          border-radius: 20px;
+          font-size: 13px;
+          cursor: pointer;
+
+          &:hover {
+            background: #4060ff;
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+      }      .replies {
+        margin-left: 40px;
+        margin-top: 4px;
+        position: relative;
+        z-index: 10;  // Replies container có z-index cao hơn
+        
+        .comment {
+          position: relative;
+          z-index: 11;  // Comment trong replies có z-index cao hơn nữa
+          
+          .menu {
+            position: relative;
+            z-index: 12;  // Menu của reply có z-index cao nhất
+            
+            .menu-dropdown {
+              z-index: 1000;  // Menu dropdown của reply luôn ở trên cùng
+            }
+          }
+        }
+        
+        .reply {
+          display: flex;
+          gap: 10px;
+          margin: 8px 0;
+          
+          img {
+            width: 24px;
+            height: 24px;
+          }
+
+          .info {
+            flex: 1;
+            background-color: themed("bgSoft");
+            padding: 8px 12px;
+            border-radius: 16px;
+
+            span {
+              font-weight: 600;
+              font-size: 12px;
+              color: themed("textColor");
+              margin-right: 5px;
+            }
+
+            p {
+              display: inline;
+              color: themed("textColor");
+              font-size: 12px;
+              line-height: 1.4;
+            }
+
+            .actions {
+              margin-top: 4px;
+              display: flex;
+              gap: 12px;
+              align-items: center;
+
+              .date {
+                color: themed("textColorSoft");
+                font-size: 11px;
+              }
+
+              .delete-button {
+                background: none;
+                border: none;
+                color: #ff4747;
+                font-size: 11px;
+                cursor: pointer;
+                padding: 0;
+                opacity: 0.8;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+            }
+          }
+        }
+
+        .show-more-button {
+          background: none;
+          border: none;
+          color: themed("textColorSoft");
+          font-size: 12px;
+          cursor: pointer;
+          padding: 8px 0;
+          margin-top: 4px;
+
+          &:hover {
+            color: themed("textColor");
+          }
+        }
+      }
+    }
+  }
+}
